@@ -1,15 +1,17 @@
 class BnApiUrls {
-  static const String apiUrl = 'https://api.binance.com';
-  static const String apiUrlTestnet = 'https://testnet.binance.vision';
+  static const String webUrl = 'www.binance.com';
 
-  static const String futuresUrl = 'https://fapi.binance.com';
-  static const String futuresUrlTestnet = 'https://testnet.binancefuture.com';
+  static const String apiUrl = 'api.binance.com';
+  static const String apiUrlTestnet = 'testnet.binance.vision';
 
-  static const String futuresCoinUrl = 'https://dapi.binance.com';
-  static const String futuresCoinUrlTestnet = 'https://testnet.binancefuture.com';
+  static const String futuresUrl = 'fapi.binance.com';
+  static const String futuresUrlTestnet = 'testnet.binancefuture.com';
 
-  static const String optionsUrl = 'https://vapi.binance.com';
-  static const String optionsUrlTestnet = 'https://testnet.binanceops.com';
+  static const String futuresCoinUrl = 'dapi.binance.com';
+  static const String futuresCoinUrlTestnet = 'testnet.binancefuture.com';
+
+  static const String optionsUrl = 'vapi.binance.com';
+  static const String optionsUrlTestnet = 'testnet.binanceops.com';
 
   static const String exchangeProducts = 'exchange-api/v1/public/asset-service/product/get-products';
 
@@ -19,4 +21,16 @@ class BnApiUrls {
   static const String futuresApiVersion = 'v1';
   static const String futuresApiVersion2 = 'v2';
   static const String optionsApiVersion = 'v1';
+}
+
+class BnAggKeys {
+  // For accessing the data returned by Client.aggregate_trades().
+  static const String aggID = 'a';
+  static const String aggPrice = 'p';
+  static const String aggQuantity = 'q';
+  static const String aggFirstTradeID = 'f';
+  static const String aggLastTradeID = 'l';
+  static const String aggTime = 'T';
+  static const String aggBuyerMakers = 'm';
+  static const String aggBestMatch = 'M';
 }

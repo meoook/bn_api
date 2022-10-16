@@ -5,7 +5,7 @@ Binance Api on Dart language. Max copied from python library.
 ## Example
 
 ```dart
-import 'package:binance/binance.dart';
+import 'package:binance/bn_api.dart';
 
 main() async {
   final _binance = Binance();

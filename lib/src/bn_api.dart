@@ -14,44 +14,44 @@ class BnApi extends BaseClient {
       // calculate timestamp offset between local and binance server
       final srvTime = await getServerTime();
       final DateTime now = DateTime.now();
-      _timeOffset = Duration(milliseconds: srvTime - now.millisecondsSinceEpoch - now.timeZoneOffset.inMilliseconds);
+      timeOffset = Duration(milliseconds: srvTime - now.millisecondsSinceEpoch);
     } catch (err) {
       throw Exception('failed to init API $err'); // TODO: other type of exception
     }
   }
 
   // General Endpoints
-  Future<bool> ping() => _get('ping', version: BnApiUrls.privateApiVersion).then((r) => true);
+  Future<bool> ping() => get('ping', version: BnApiUrls.privateApiVersion).then((r) => true);
 
-  Future<int> getServerTime() => _get('time', version: BnApiUrls.privateApiVersion).then((r) => r['serverTime']);
+  Future<int> getServerTime() => get('time', version: BnApiUrls.privateApiVersion).then((r) => r['serverTime']);
 
   // Exchange Endpoints
-  Future getProducts() => _requestWebsite(HttpMethod.get, BnApiUrls.exchangeProducts).then((r) => r);
+  Future getProducts() => requestWebsite(HttpMethod.get, BnApiUrls.exchangeProducts).then((r) => r);
 
-  Future getExchangeInfo() => _get('exchangeInfo', version: BnApiUrls.privateApiVersion).then((r) => r);
+  Future getExchangeInfo() => get('exchangeInfo', version: BnApiUrls.privateApiVersion).then((r) => r);
 
   Future getSymbolInfo(String symbol) =>
       getExchangeInfo().then((value) => value['symbols'].firstWhere((e) => e['symbol'] == symbol.toUpperCase()));
 
   // Market Data Endpoints
-  Future getAllTickers() => _get('ticker/price', version: BnApiUrls.privateApiVersion).then((r) => r);
+  Future getAllTickers() => get('ticker/price', version: BnApiUrls.privateApiVersion).then((r) => r);
 
   Future getTicker(String symbol) =>
-      _get('ticker/price', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol}).then((r) => r);
+      get('ticker/price', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol}).then((r) => r);
 
   Future getOrderBookTickers(String symbol) =>
-      _get('ticker/bookTicker', version: BnApiUrls.privateApiVersion).then((r) => r);
+      get('ticker/bookTicker', version: BnApiUrls.privateApiVersion).then((r) => r);
 
   Future getOrderBook(Map<String, dynamic> params) =>
-      _get('depth', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
+      get('depth', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
 
-  Future getRecentTrades(Map<String, dynamic> params) => _get('trades', params: params).then((r) => r);
+  Future getRecentTrades(Map<String, dynamic> params) => get('trades', params: params).then((r) => r);
 
   Future getHistoricalTrades(Map<String, dynamic> params) =>
-      _get('historicalTrades', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
+      get('historicalTrades', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
 
   Future getAggregateTrades(Map<String, dynamic> params) =>
-      _get('aggTrades', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
+      get('aggTrades', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
 
   Stream aggregateTradeIter(String symbol, String? startStr, int? lastID) async* {
     if (startStr != null && lastID != null) {
@@ -106,7 +106,7 @@ class BnApi extends BaseClient {
   }
 
   Future getKLines(Map<String, dynamic> params) async {
-    return await _get('klines', version: BnApiUrls.privateApiVersion, params: params);
+    return await get('klines', version: BnApiUrls.privateApiVersion, params: params);
   }
 
   Future _kLines(Map<String, dynamic> params, {KLinesType kLinesType = KLinesType.spot}) async {
