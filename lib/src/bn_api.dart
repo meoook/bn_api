@@ -129,10 +129,7 @@ class BnApi extends BaseClient {
       'startTime': 0,
       'endTime': DateTime.now().millisecondsSinceEpoch
     };
-    var kline = await _kLines(
-      params,
-      kLinesType: kLinesType,
-    );
+    var kline = await _kLines(params, kLinesType: kLinesType);
     return kline[0][0];
   }
 
@@ -144,121 +141,828 @@ class BnApi extends BaseClient {
 
   Future _historicalKLines(String symbol, int interval,
       {String? startStr, String? endStr, int limit = 1000, KLinesType kLinesType = KLinesType.spot}) async {
-    final outputData = [];
+    // TODO: not implemented
+    // final outputData = [];
     // timeframe = interval_to_milliseconds(interval)
   }
 
-// # convert interval to useful value in seconds
-// timeframe = interval_to_milliseconds(interval)
-//
-// # establish first available start timestamp
-// start_ts = convert_ts_str(start_str)
-// if start_ts is not None:
-// first_valid_ts = await self._get_earliest_valid_timestamp(symbol, interval, klines_type)
-// start_ts = max(start_ts, first_valid_ts)
-//
-// # if an end time was passed convert it
-// end_ts = convert_ts_str(end_str)
-// if end_ts and start_ts and end_ts <= start_ts:
-// return output_data
-//
-// idx = 0
-// while True:
-// # fetch the klines from start_ts up to max 500 entries or the end_ts if set
-// temp_data = await self._klines(
-// klines_type=klines_type,
-// symbol=symbol,
-// interval=interval,
-// limit=limit,
-// startTime=start_ts,
-// endTime=end_ts
-// )
-//
-// # append this loops data to our output data
-// if temp_data:
-// output_data += temp_data
-//
-// # handle the case where exactly the limit amount of data was returned last loop
-// # or check if we received less than the required limit and exit the loop
-// if not len(temp_data) or len(temp_data) < limit:
-// # exit the while loop
-// break
-//
-// # set our start timestamp using the last value in the array
-// # and increment next call by our timeframe
-// start_ts = temp_data[-1][0] + timeframe
-//
-// # exit loop if we reached end_ts before reaching <limit> klines
-// if end_ts and start_ts >= end_ts:
-// break
-//
-// # sleep after every 3rd call to be kind to the API
-// idx += 1
-// if idx % 3 == 0:
-// await asyncio.sleep(1)
-//
-// return output_data
-// _historical_klines.__doc__ = Client._historical_klines.__doc__
-//
-// async def get_historical_klines_generator(self, symbol, interval, start_str=None, end_str=None, limit=1000,
-// klines_type: HistoricalKlinesType = HistoricalKlinesType.SPOT):
-// return self._historical_klines_generator(
-// symbol, interval, start_str, end_str=end_str, limit=limit, klines_type=klines_type
-// )
-// get_historical_klines_generator.__doc__ = Client.get_historical_klines_generator.__doc__
-//
-// async def _historical_klines_generator(self, symbol, interval, start_str=None, end_str=None, limit=1000,
-// klines_type: HistoricalKlinesType = HistoricalKlinesType.SPOT):
-//
-// # convert interval to useful value in seconds
-// timeframe = interval_to_milliseconds(interval)
-//
-// # if a start time was passed convert it
-// start_ts = convert_ts_str(start_str)
-//
-// # establish first available start timestamp
-// if start_ts is not None:
-// first_valid_ts = await self._get_earliest_valid_timestamp(symbol, interval, klines_type)
-// start_ts = max(start_ts, first_valid_ts)
-//
-// # if an end time was passed convert it
-// end_ts = convert_ts_str(end_str)
-// if end_ts and start_ts and end_ts <= start_ts:
-// return
-//
-// idx = 0
-// while True:
-// # fetch the klines from start_ts up to max 500 entries or the end_ts if set
-// output_data = await self._klines(
-// klines_type=klines_type,
-// symbol=symbol,
-// interval=interval,
-// limit=limit,
-// startTime=start_ts,
-// endTime=end_ts
-// )
-//
-// # yield data
-// if output_data:
-// for o in output_data:
-// yield o
-//
-// # handle the case where exactly the limit amount of data was returned last loop
-// # check if we received less than the required limit and exit the loop
-// if not len(output_data) or len(output_data) < limit:
-// # exit the while loop
-// break
-//
-// # increment next call by our timeframe
-// start_ts = output_data[-1][0] + timeframe
-//
-// # exit loop if we reached end_ts before reaching <limit> klines
-// if end_ts and start_ts >= end_ts:
-// break
-//
-// # sleep after every 3rd call to be kind to the API
-// idx += 1
-// if idx % 3 == 0:
-// await asyncio.sleep(1)
-// _historical_klines_generator.__doc__ = Client._historical_klines_generator.__doc__
+  Future getHistoricalKLinesGenerator(String symbol, int interval,
+      {String? startStr, String? endStr, int limit = 1000, KLinesType kLinesType = KLinesType.spot}) async {
+    return await _historicalKLinesGenerator(symbol, interval,
+        startStr: startStr, endStr: endStr, limit: limit, kLinesType: kLinesType);
+  }
+
+  Future _historicalKLinesGenerator(String symbol, int interval,
+      {String? startStr, String? endStr, int limit = 1000, KLinesType kLinesType = KLinesType.spot}) async {
+    // TODO: not implemented
+  }
+
+  // TODO: set params
+  Future getAvgPrice(String symbol) =>
+      get('avgPrice', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol}).then((r) => r);
+
+  // TODO: set params
+  Future getTicker24h(String symbol) =>
+      get('ticker/24hr', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol}).then((r) => r);
+
+  // TODO: set params
+  Future getSymbolTicker(String symbol) =>
+      get('ticker/price', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol}).then((r) => r);
+
+  // TODO: set params
+  Future getOrderBookTicker(String symbol) =>
+      get('ticker/bookTicker', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol}).then((r) => r);
+
+  // Account Endpoints
+
+  /// Send in a new order.
+  /// https://binance-docs.github.io/apidocs/spot/en/#new-order-trade
+  /// LIMIT_MAKER are LIMIT orders that will be rejected if they would immediately match and trade as a taker.
+  /// STOP_LOSS and TAKE_PROFIT will execute a MARKET order when the [stopPrice] is reached.
+  /// Any LIMIT or LIMIT_MAKER type order can be made an iceberg order by sending an [icebergQty].
+  /// Any order with an [icebergQty] MUST have [timeInForce] set to GTC.
+  /// MARKET orders using the [quantity] field specifies the amount of the base asset to buy or sell at the market price
+  /// MARKET orders using [quoteOrderQty] specifies the amount the user wants to spend (when buying)
+  ///      or receive (when selling) the quote asset; the correct [quantity] will be determined based on the
+  ///      market liquidity and [quoteOrderQty].
+  /// MARKET orders using [quoteOrderQty] will not break LOT_SIZE filter rules;
+  ///     the order will execute a [quantity] that will have the notional value as close as possible to [quoteOrderQty].
+  /// same [newClientOrderId] can be accepted only when the previous one is filled, otherwise the order will be rejected
+  /// For STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT_LIMIT and TAKE_PROFIT orders,
+  ///     [trailingDelta] can be combined with [stopPrice].
+  Future createOrder(
+    String symbol,
+    String side,
+    String orderType, {
+    String? timeInForce,
+    double? quantity,
+    double? quoteOrderQty,
+    double? price,
+    String? newClientOrderId, // A unique id among open orders. Automatically generated if not sent.
+    int? strategyId,
+    int? strategyType, // The value cannot be less than 1000000.
+    double? stopPrice, // Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
+    int? trailingDelta, // Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
+    double? icebergQty, // Used with LIMIT, STOP_LOSS_LIMIT, and TAKE_PROFIT_LIMIT to create an iceberg order.
+    String? newOrderRespType, // Set the response JSON. ACK, RESULT, or FULL;
+    // MARKET and LIMIT order types default to FULL, all other orders default to ACK
+  }) async {
+    final _data = {
+      'symbol': symbol,
+      'side': side,
+      'type': orderType,
+      if (timeInForce != null) 'timeInForce': timeInForce,
+      if (quantity != null) 'quantity': quantity,
+      if (quoteOrderQty != null) 'quoteOrderQty': quoteOrderQty,
+      if (price != null) 'price': price,
+      if (newClientOrderId != null) 'newClientOrderId': newClientOrderId,
+      if (strategyId != null) 'strategyId': strategyId,
+      if (strategyType != null) 'strategyType': strategyType,
+      if (stopPrice != null) 'stopPrice': stopPrice,
+      if (trailingDelta != null) 'trailingDelta': trailingDelta,
+      if (icebergQty != null) 'icebergQty': icebergQty,
+      if (newOrderRespType != null) 'newOrderRespType': newOrderRespType,
+    };
+    return await post('order', signed: true, params: _data);
+  }
+
+  Future orderLimit(String symbol, String side, double price, double quantity, {String? timeInForce}) async {
+    return await createOrder(
+      symbol,
+      side,
+      BnApiOrderType.orderTypeLimit,
+      price: price,
+      quantity: quantity,
+      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+    );
+  }
+
+  Future order_limit_buy(String symbol, double price, double quantity, {String? timeInForce}) async {
+    return await createOrder(
+      symbol,
+      BaseClient.sideBuy,
+      BnApiOrderType.orderTypeLimit,
+      price: price,
+      quantity: quantity,
+      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+    );
+  }
+
+  Future order_limit_sell(String symbol, double price, double quantity, {String? timeInForce}) async {
+    return await createOrder(
+      symbol,
+      BaseClient.sideSell,
+      BnApiOrderType.orderTypeLimit,
+      price: price,
+      quantity: quantity,
+      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+    );
+  }
+
+  Future orderMarket(String symbol, String side, double price, double quantity, {String? timeInForce}) async {
+    return await createOrder(
+      symbol,
+      side,
+      BnApiOrderType.orderTypeMarket,
+      price: price,
+      quantity: quantity,
+      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+    );
+  }
+
+  Future order_market_buy(String symbol, double price, double quantity, {String? timeInForce}) async {
+    return await createOrder(
+      symbol,
+      BaseClient.sideBuy,
+      BnApiOrderType.orderTypeMarket,
+      price: price,
+      quantity: quantity,
+      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+    );
+  }
+
+  Future order_market_sell(String symbol, double price, double quantity, {String? timeInForce}) async {
+    return await createOrder(
+      symbol,
+      BaseClient.sideSell,
+      BnApiOrderType.orderTypeMarket,
+      price: price,
+      quantity: quantity,
+      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+    );
+  }
+
+  /// Send in a new OCO
+  /// https://binance-docs.github.io/apidocs/spot/en/#new-oco-trade
+  Future create_oco_order(
+    String symbol,
+    String side,
+    double price,
+    double quantity, {
+    String? listClientOrderId, // A unique Id for the entire orderList
+    String? limitClientOrderId, // A unique Id for the limit order
+    int? limitStrategyId,
+    int? limitStrategyType, // The value cannot be less than 1000000
+    double? limitIcebergQty,
+    int? trailingDelta, // type: LONG
+    String? stopClientOrderId,
+    double? stopPrice,
+    int? stopStrategyId,
+    int? stopStrategyType, // The value cannot be less than 1000000
+    double? stopLimitPrice, // If provided, stopLimitTimeInForce is required
+    double? stopIcebergQty,
+    String? stopLimitTimeInForce, // Valid values are GTC/FOK/IOC
+    String? newOrderRespType, // Set the response JSON.
+  }) async {
+    final _data = {
+      'symbol': symbol,
+      'side': side,
+      'price': price,
+      'quantity': quantity,
+      if (listClientOrderId != null) 'listClientOrderId': listClientOrderId,
+      if (limitClientOrderId != null) 'limitClientOrderId': limitClientOrderId,
+      if (limitStrategyId != null) 'limitStrategyId': limitStrategyId,
+      if (limitStrategyType != null) 'limitStrategyType': limitStrategyType,
+      if (limitIcebergQty != null) 'limitIcebergQty': limitIcebergQty,
+      if (trailingDelta != null) 'trailingDelta': trailingDelta,
+      if (stopClientOrderId != null) 'stopClientOrderId': stopClientOrderId,
+      if (stopPrice != null) 'stopPrice': stopPrice,
+      if (stopStrategyId != null) 'stopStrategyId': stopStrategyId,
+      if (stopStrategyType != null) 'stopStrategyType': stopStrategyType,
+      if (stopLimitPrice != null) 'stopLimitPrice': stopLimitPrice,
+      if (stopIcebergQty != null) 'stopIcebergQty': stopIcebergQty,
+      if (stopLimitTimeInForce != null) 'stopLimitTimeInForce': stopLimitTimeInForce,
+      if (newOrderRespType != null) 'newOrderRespType': newOrderRespType,
+    };
+    return await post('order/oco', signed: true, params: _data);
+  }
+
+  /// Test new order creation and signature
+  /// Creates and validates a new order but does not send it into the matching engine.
+  /// https://binance-docs.github.io/apidocs/spot/en/#test-new-order-trade
+  Future createTestOrder(
+    String symbol,
+    String side,
+    String orderType, {
+    String? timeInForce,
+    double? quantity,
+    double? quoteOrderQty,
+    double? price,
+    String? newClientOrderId, // A unique id among open orders. Automatically generated if not sent.
+    int? strategyId,
+    int? strategyType, // The value cannot be less than 1000000.
+    double? stopPrice, // Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
+    int? trailingDelta, // Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
+    double? icebergQty, // Used with LIMIT, STOP_LOSS_LIMIT, and TAKE_PROFIT_LIMIT to create an iceberg order.
+    String? newOrderRespType, // Set the response JSON. ACK, RESULT, or FULL;
+    // MARKET and LIMIT order types default to FULL, all other orders default to ACK
+  }) async {
+    final _data = {
+      'symbol': symbol,
+      'side': side,
+      'type': orderType,
+      if (timeInForce != null) 'timeInForce': timeInForce,
+      if (quantity != null) 'quantity': quantity,
+      if (quoteOrderQty != null) 'quoteOrderQty': quoteOrderQty,
+      if (price != null) 'price': price,
+      if (newClientOrderId != null) 'newClientOrderId': newClientOrderId,
+      if (strategyId != null) 'strategyId': strategyId,
+      if (strategyType != null) 'strategyType': strategyType,
+      if (stopPrice != null) 'stopPrice': stopPrice,
+      if (trailingDelta != null) 'trailingDelta': trailingDelta,
+      if (icebergQty != null) 'icebergQty': icebergQty,
+      if (newOrderRespType != null) 'newOrderRespType': newOrderRespType,
+    };
+    return await post('order/test', signed: true, params: _data);
+  }
+
+  /// Check an order's status.
+  ///
+  /// Either [orderId] or [origClientOrderId] must be sent.
+  Future getOrder(String symbol, {int? orderId, String? origClientOrderId}) async {
+    assert(orderId != null || origClientOrderId != null, 'orderId or origClientOrderId must be set to get order');
+    return await get('order', signed: true, params: {
+      'symbol': symbol,
+      if (orderId != null) 'orderId': orderId,
+      if (origClientOrderId != null) 'origClientOrderId': origClientOrderId,
+    });
+  }
+
+  /// Get all account orders; active, canceled, or filled.
+  /// https://binance-docs.github.io/apidocs/spot/en/#all-orders-user_data
+  /// If [orderId] is set, it will get orders >= that [orderId]. Otherwise most recent orders are returned.
+  /// If [startTime] and/or [endTime] provided, [orderId] is not required.
+  Future getAllOrders(String symbol, {int? orderId, String? startTime, String? endTime, int limit = 500}) async {
+    return await get('allOrders', signed: true, params: {
+      'symbol': symbol,
+      'limit': limit,
+      if (orderId != null) 'orderId': orderId,
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+    });
+  }
+
+  /// Cancel an active order.
+  /// https://binance-docs.github.io/apidocs/spot/en/#cancel-order-trade
+  /// Either [orderId] or [origClientOrderId] must be sent.
+  /// If both [orderId] and [origClientOrderId] are provided, [orderId] takes precedence.
+  Future cancelOrder(String symbol, {int? orderId, String? origClientOrderId, String? newClientOrderId}) async {
+    assert(orderId != null || origClientOrderId != null, 'orderId or origClientOrderId must be set to get order');
+    return await delete('order', signed: true, params: {
+      'symbol': symbol,
+      if (orderId != null) 'orderId': orderId,
+      if (origClientOrderId != null) 'origClientOrderId': origClientOrderId,
+      if (newClientOrderId != null) 'newClientOrderId': newClientOrderId,
+    });
+  }
+
+  /// Cancels all active orders on a symbol. This includes OCO orders.
+  /// https://binance-docs.github.io/apidocs/spot/en/#cancel-all-open-orders-on-a-symbol-trade
+  Future cancelOrders(String symbol) async {
+    return await delete('openOrders', signed: true, params: {'symbol': symbol}); // List of orders
+  }
+
+  /// Get all open orders on a symbol.
+  /// https://binance-docs.github.io/apidocs/spot/en/#current-open-orders-user_data
+  Future getOpenOrders(String symbol) async {
+    return await delete('openOrders', signed: true, params: {'symbol': symbol}); // List of orders
+  }
+
+  /// Cancels an existing order and places a new order on the same symbol.
+  /// https://binance-docs.github.io/apidocs/spot/en/#cancel-an-existing-order-and-send-a-new-order-trade
+  Future cancelReplaceOrder(String symbol) async {
+    // TODO: not done
+    return await post('order/cancelReplace', signed: true, params: {'symbol': symbol});
+  }
+
+  // User Stream Endpoints
+
+  /// Get current account information.
+  /// https://binance-docs.github.io/apidocs/spot/en/#account-information-user_data
+  Future get_account() async {
+    return await get('account', signed: true);
+  }
+
+  /// Get balance for selected asset/coin
+  ///  "asset": "BTC",
+  ///  "free": "4723846.89208129",
+  ///  "locked": "0.00000000"
+  Future<Map<String, dynamic>?> getAssetBalance(String asset) async {
+    final Map _res = await get_account();
+    if (_res.containsKey('balances')) {
+      final List<Map<String, dynamic>> _balances = _res['balances'];
+      final _balancesIterator = _balances.iterator;
+      while (_balancesIterator.moveNext()) {
+        final Map<String, dynamic> _balance = _balancesIterator.current;
+        if (_balance['asset'].toLowerCase() == asset.toLowerCase()) return _balance;
+      }
+    }
+    return null;
+  }
+
+  Future get_my_trades() async {
+    return await get('myTrades', signed: true);
+  }
+
+  Future get_system_status() async {
+    return await requestMarginApi(HttpMethod.get, 'system/status');
+  }
+
+  Future get_account_status() async {
+    return await requestMarginApi(HttpMethod.get, 'account/status', signed: true);
+  }
+
+  Future get_account_api_trading_status() async {
+    return await requestMarginApi(HttpMethod.get, 'account/apiTradingStatus', signed: true);
+  }
+
+  Future get_account_api_permissions() async {
+    return await requestMarginApi(HttpMethod.get, 'account/apiRestrictions', signed: true);
+  }
+
+  Future get_dust_assets() async {
+    return await requestMarginApi(HttpMethod.post, 'asset/dust-btc', signed: true);
+  }
+
+  Future get_dust_log() async {
+    return await requestMarginApi(HttpMethod.get, 'asset/dribblet', signed: true);
+  }
+
+  Future transfer_dust() async {
+    return await requestMarginApi(HttpMethod.post, 'asset/dust', signed: true);
+  }
+
+  Future get_asset_dividend_history() async {
+    return await requestMarginApi(HttpMethod.get, 'asset/assetDividend', signed: true);
+  }
+
+  Future make_universal_transfer() async {
+    return await requestMarginApi(HttpMethod.post, 'asset/transfer', signed: true);
+  }
+
+  Future query_universal_transfer_history() async {
+    return await requestMarginApi(HttpMethod.get, 'asset/transfer', signed: true);
+  }
+
+  Future get_trade_fee() async {
+    return await requestMarginApi(HttpMethod.get, 'asset/tradeFee', signed: true);
+  }
+
+  Future get_asset_details() async {
+    return await requestMarginApi(HttpMethod.get, 'asset/assetDetail', signed: true);
+  }
+
+  // Withdraw Endpoints
+  Future withdraw({String? coin, String? name}) async {
+    // force a name for the withdrawal if one not set
+    final Map<String, dynamic> _params = {
+      if (coin != null && name == null) 'name': coin else if (name != null) 'name': name,
+    };
+    return await requestMarginApi(HttpMethod.post, 'capital/withdraw/apply', signed: true, params: _params);
+  }
+
+  Future get_deposit_history() async {
+    return await requestMarginApi(HttpMethod.get, 'capital/deposit/hisrec', signed: true);
+  }
+
+  Future get_withdraw_history() async {
+    return await requestMarginApi(HttpMethod.get, 'capital/withdraw/history', signed: true);
+  }
+
+  Future get_withdraw_history_id(int withdrawID) async {
+    final _history = await get_withdraw_history();
+
+    final _historyIterator = _history.iterator;
+    while (_historyIterator.moveNext()) {
+      final Map<String, dynamic> _entry = _historyIterator.current;
+      if (_entry.containsKey('id') && _entry['id'] == withdrawID) return _entry;
+    }
+    throw Exception('there is no entry with withdraw id $withdrawID');
+  }
+
+  Future get_deposit_address(String coin, {String? network}) async {
+    final Map<String, dynamic> _params = {
+      'coin': coin,
+      if (network != null) 'network': network,
+    };
+    return await requestMarginApi(HttpMethod.get, 'capital/deposit/address', signed: true, params: _params);
+  }
+
+  // User Stream Endpoints
+
+  Future stream_get_listen_key() async {
+    final result = await post('userDataStream', signed: false, params: {});
+    return result['listenKey'];
+  }
+
+  Future stream_keepAlive(String listenKey) async {
+    return await put('userDataStream', signed: false, params: {'listenKey': listenKey});
+  }
+
+  Future stream_close(String listenKey) async {
+    return await delete('userDataStream', signed: false, params: {'listenKey': listenKey});
+  }
+
+  // Margin Trading Endpoints
+
+  Future get_margin_account() async {
+    return await requestMarginApi(HttpMethod.get, 'margin/account', signed: true);
+  }
+
+  Future get_isolated_margin_account() async {
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/account', signed: true);
+  }
+
+  Future enable_isolated_margin_account() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'margin/isolated/account', signed: true, params: _params);
+  }
+
+  Future disable_isolated_margin_account() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.delete, 'margin/isolated/account', signed: true, params: _params);
+  }
+
+  Future get_margin_asset() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/asset', params: _params);
+  }
+
+  Future get_margin_symbol() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/pair', params: _params);
+  }
+
+  Future get_margin_all_assets() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/allAssets', params: _params);
+  }
+
+  Future get_margin_all_pairs() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/allPairs', params: _params);
+  }
+
+  Future create_isolated_margin_account() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'margin/isolated/create', signed: true, params: _params);
+  }
+
+  Future get_isolated_margin_symbol() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/pair', signed: true, params: _params);
+  }
+
+  Future get_all_isolated_margin_symbols() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/allPairs', signed: true, params: _params);
+  }
+
+  Future toggle_bnb_burn_spot_margin() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'bnbBurn', signed: true, params: _params);
+  }
+
+  Future get_bnb_burn_spot_margin() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'bnbBurn', signed: true, params: _params);
+  }
+
+  Future get_margin_price_index() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/priceIndex', params: _params);
+  }
+
+  Future transfer_margin_to_spot() async {
+    final Map<String, dynamic> _params = {'type': 2};
+    return await requestMarginApi(HttpMethod.post, 'margin/transfer', signed: true, params: _params);
+  }
+
+  Future transfer_spot_to_margin() async {
+    final Map<String, dynamic> _params = {'type': 1};
+    return await requestMarginApi(HttpMethod.post, 'margin/transfer', signed: true, params: _params);
+  }
+
+  Future transfer_isolated_margin_to_spot() async {
+    final Map<String, dynamic> _params = {'transFrom': 'ISOLATED_MARGIN', 'transTo': 'SPOT'};
+    return await requestMarginApi(HttpMethod.post, 'margin/isolated/transfer', signed: true, params: _params);
+  }
+
+  Future transfer_spot_to_isolated_margin() async {
+    final Map<String, dynamic> _params = {'transFrom': 'SPOT', 'transTo': 'ISOLATED_MARGIN'};
+    return await requestMarginApi(HttpMethod.post, 'margin/isolated/transfer', signed: true, params: _params);
+  }
+
+  Future create_margin_loan() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'margin/loan', signed: true, params: _params);
+  }
+
+  Future repay_margin_loan() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'margin/repay', signed: true, params: _params);
+  }
+
+  Future create_margin_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'margin/order', signed: true, params: _params);
+  }
+
+  Future cancel_margin_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.delete, 'margin/order', signed: true, params: _params);
+  }
+
+  Future get_margin_loan_details() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/loan', signed: true, params: _params);
+  }
+
+  Future get_margin_repay_details() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/repay', signed: true, params: _params);
+  }
+
+  Future get_cross_margin_data() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/crossMarginData', signed: true, params: _params);
+  }
+
+  Future get_margin_interest_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/interestHistory', signed: true, params: _params);
+  }
+
+  Future get_margin_force_liquidation_rec() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/forceLiquidationRec', signed: true, params: _params);
+  }
+
+  Future get_margin_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/order', signed: true, params: _params);
+  }
+
+  Future get_open_margin_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/openOrders', signed: true, params: _params);
+  }
+
+  Future get_all_margin_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/allOrders', signed: true, params: _params);
+  }
+
+  Future get_margin_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/myTrades', signed: true, params: _params);
+  }
+
+  Future get_max_margin_loan() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/maxBorrowable', signed: true, params: _params);
+  }
+
+  Future get_max_margin_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/maxTransferable', signed: true, params: _params);
+  }
+
+  // Margin OCO
+
+  Future create_margin_oco_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'margin/order/oco', signed: true, params: _params);
+  }
+
+  Future cancel_margin_oco_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.delete, 'margin/orderList', signed: true, params: _params);
+  }
+
+  Future get_margin_oco_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/orderList', signed: true, params: _params);
+  }
+
+  Future get_open_margin_oco_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'margin/allOrderList', signed: true, params: _params);
+  }
+
+  // Cross-margin
+
+  Future margin_stream_get_listen_key() async {
+    final _response = await requestMarginApi(HttpMethod.post, 'userDataStream', signed: false, params: {});
+    return _response['listenKey'];
+  }
+
+  Future margin_stream_keepAlive(String listenKey) async {
+    final Map<String, dynamic> _params = {'listenKey': listenKey};
+    return await requestMarginApi(HttpMethod.put, 'userDataStream', signed: false, params: _params);
+  }
+
+  Future margin_stream_close(String listenKey) async {
+    final Map<String, dynamic> _params = {'listenKey': listenKey};
+    return await requestMarginApi(HttpMethod.delete, 'userDataStream', signed: false, params: _params);
+  }
+
+  // Isolated margin
+
+  Future isolated_margin_stream_get_listen_key(String symbol) async {
+    final Map<String, dynamic> _params = {'symbol': symbol};
+    final _res = await requestMarginApi(HttpMethod.post, 'userDataStream/isolated', signed: false, params: _params);
+    return _res['listenKey'];
+  }
+
+  Future isolated_margin_stream_keepAlive(String symbol, String listenKey) async {
+    final Map<String, dynamic> _params = {'symbol': symbol, 'listenKey': listenKey};
+    return await requestMarginApi(HttpMethod.put, 'userDataStream/isolated', signed: false, params: _params);
+  }
+
+  Future isolated_margin_stream_close(String symbol, String listenKey) async {
+    final Map<String, dynamic> _params = {'symbol': symbol, 'listenKey': listenKey};
+    return await requestMarginApi(HttpMethod.delete, 'userDataStream/isolated', signed: false, params: _params);
+  }
+
+  // Lending Endpoints
+
+  Future get_lending_product_list() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/daily/product/list', signed: true, params: _params);
+  }
+
+  Future get_lending_daily_quota_left() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/daily/userLeftQuota', signed: true, params: _params);
+  }
+
+  Future purchase_lending_product() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'lending/daily/purchase', signed: true, params: _params);
+  }
+
+  Future get_lending_daily_redemption_quota() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/daily/userRedemptionQuota', signed: true, params: _params);
+  }
+
+  Future redeem_lending_product() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'lending/daily/redeem', signed: true, params: _params);
+  }
+
+  Future get_lending_position() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/daily/token/position', signed: true, params: _params);
+  }
+
+  Future get_fixed_activity_project_list() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/project/list', signed: true, params: _params);
+  }
+
+  Future get_lending_account() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/union/account', signed: true, params: _params);
+  }
+
+  Future get_lending_purchase_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/union/purchaseRecord', signed: true, params: _params);
+  }
+
+  Future get_lending_redemption_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/union/redemptionRecord', signed: true, params: _params);
+  }
+
+  Future get_lending_interest_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'lending/union/interestHistory', signed: true, params: _params);
+  }
+
+  Future change_fixed_activity_to_daily_position() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'lending/positionChanged', signed: true, params: _params);
+  }
+
+  // Sub Accounts
+
+  Future get_sub_account_list() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/list', signed: true, params: _params);
+  }
+
+  Future get_sub_account_transfer_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/sub/transfer/history', signed: true, params: _params);
+  }
+
+  Future get_sub_account_futures_transfer_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/futures/internalTransfer',
+        signed: true, params: _params);
+  }
+
+  Future create_sub_account_futures_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'sub-account/futures/internalTransfer',
+        signed: true, params: _params);
+  }
+
+  Future get_sub_account_assets() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/assets', signed: true, params: _params);
+  }
+
+  Future query_subAccount_spot_summary() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/spotSummary', signed: true, params: _params);
+  }
+
+  Future get_subAccount_deposit_address() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'capital/deposit/subAddress', signed: true, params: _params);
+  }
+
+  Future get_subAccount_deposit_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'capital/deposit/subHisrec', signed: true, params: _params);
+  }
+
+  Future get_subAccount_futures_margin_status() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/status', signed: true, params: _params);
+  }
+
+  Future enable_subAccount_margin() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'sub-account/margin/enable', signed: true, params: _params);
+  }
+
+  Future get_subAccount_margin_details() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/margin/account', signed: true, params: _params);
+  }
+
+  Future get_subAccount_margin_summary() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/margin/accountSummary', signed: true, params: _params);
+  }
+
+  Future enable_subAccount_futures() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'sub-account/futures/enable', signed: true, params: _params);
+  }
+
+  Future get_subAccount_futures_details() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/futures/account', signed: true, params: _params);
+  }
+
+  Future get_subAccount_futures_summary() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/futures/accountSummary', signed: true, params: _params);
+  }
+
+  Future get_subAccount_futures_positionRisk() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/futures/positionRisk', signed: true, params: _params);
+  }
+
+  Future make_subAccount_futures_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'sub-account/futures/transfer', signed: true, params: _params);
+  }
+
+  Future make_subAccount_margin_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'sub-account/margin/transfer', signed: true, params: _params);
+  }
+
+  Future make_subAccount_to_subAccount_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'sub-account/transfer/subToSub', signed: true, params: _params);
+  }
+
+  Future make_subAccount_to_master_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'sub-account/transfer/subToMaster', signed: true, params: _params);
+  }
+
+  Future get_subAccount_transfer_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/transfer/subUserHistory', signed: true, params: _params);
+  }
+
+  Future make_subAccount_universal_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.post, 'sub-account/universalTransfer', signed: true, params: _params);
+  }
+
+  Future get_universal_transfer_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'sub-account/universalTransfer', signed: true, params: _params);
+  }
 }
