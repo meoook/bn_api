@@ -965,4 +965,636 @@ class BnApi extends BaseClient {
     final Map<String, dynamic> _params = {};
     return await requestMarginApi(HttpMethod.get, 'sub-account/universalTransfer', signed: true, params: _params);
   }
+
+  // Futures API
+
+  Future futures_ping() async {
+    return await requestFuturesApi(HttpMethod.get, 'ping');
+  }
+
+  Future futures_time() async {
+    return await requestFuturesApi(HttpMethod.get, 'time');
+  }
+
+  Future futures_exchange_info() async {
+    return await requestFuturesApi(HttpMethod.get, 'exchangeInfo');
+  }
+
+  Future futures_order_book() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'depth', params: _params);
+  }
+
+  Future futures_historical_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'historicalTrades', params: _params);
+  }
+
+  Future futures_aggregate_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'aggTrades', params: _params);
+  }
+
+  Future futures_kLines() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'klines', params: _params);
+  }
+
+  Future futures_continous_kLines() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'continuousKlines', params: _params);
+  }
+
+  Future futures_historical_kLines(String symbol, int interval, String startStr,
+      [String? endStr, int limit = 500]) async {
+    return await _historicalKLines(symbol, interval,
+        startStr: startStr, endStr: endStr, limit: limit, kLinesType: KLinesType.futures);
+  }
+
+  Future futures_historical_kLines_generator(String symbol, int interval, String startStr, [String? endStr]) async {
+    return await _historicalKLinesGenerator(symbol, interval,
+        startStr: startStr, endStr: endStr, kLinesType: KLinesType.futures);
+  }
+
+  Future futures_mark_price() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'premiumIndex', params: _params);
+  }
+
+  Future futures_funding_rate() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'fundingRate', params: _params);
+  }
+
+  Future futures_top_longshort_account_ratio() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'topLongShortAccountRatio', params: _params);
+  }
+
+  Future futures_top_longshort_position_ratio() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'topLongShortPositionRatio', params: _params);
+  }
+
+  Future futures_global_longshort_ratio() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'globalLongShortAccountRatio', params: _params);
+  }
+
+  Future futures_ticker() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'ticker/24hr', params: _params);
+  }
+
+  Future futures_symbol_ticker() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'ticker/price', params: _params);
+  }
+
+  Future futures_orderbook_ticker() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'ticker/bookTicker', params: _params);
+  }
+
+  Future futures_liquidation_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'forceOrders', params: _params);
+  }
+
+  Future futures_adl_quantile_estimate() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'adlQuantile', signed: true, params: _params);
+  }
+
+  Future futures_open_interest() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'openInterest', params: _params);
+  }
+
+  Future futures_open_interest_hist() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'openInterestHist', params: _params);
+  }
+
+  Future futures_leverage_bracket() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'leverageBracket', signed: true, params: _params);
+  }
+
+  Future futures_account_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.post, 'futures/transfer', signed: true, params: _params);
+  }
+
+  Future transfer_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'futures/transfer', signed: true, params: _params);
+  }
+
+  Future futures_create_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.post, 'order', signed: true, params: _params);
+  }
+
+  Future futures_place_batch_order() async {
+    // TODO: not done
+    // query_string = urlencode(params)
+    // query_string = query_string.replace('%27', '%22')
+    // params['batchOrders'] = query_string[12:]
+
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.post, 'batchOrders', signed: true, params: _params);
+  }
+
+  Future futures_get_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'order', signed: true, params: _params);
+  }
+
+  Future futures_get_open_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'openOrders', signed: true, params: _params);
+  }
+
+  Future futures_get_all_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'allOrders', signed: true, params: _params);
+  }
+
+  Future futures_cancel_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.delete, 'order', signed: true, params: _params);
+  }
+
+  Future futures_cancel_all_open_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.delete, 'allOpenOrders', signed: true, params: _params);
+  }
+
+  Future futures_cancel_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.delete, 'batchOrders', signed: true, params: _params);
+  }
+
+  Future futures_account_balance() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'balance', signed: true, params: _params);
+  }
+
+  Future futures_account() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'account', signed: true, params: _params);
+  }
+
+  Future futures_change_leverage() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.post, 'leverage', signed: true, params: _params);
+  }
+
+  Future futures_change_margin_type() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.post, 'marginType', signed: true, params: _params);
+  }
+
+  Future futures_change_position_margin() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.post, 'positionMargin', signed: true, params: _params);
+  }
+
+  Future futures_position_margin_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'positionMargin/history', signed: true, params: _params);
+  }
+
+  Future futures_position_information() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'positionRisk', signed: true, params: _params);
+  }
+
+  Future futures_account_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'userTrades', signed: true, params: _params);
+  }
+
+  Future futures_income_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'income', signed: true, params: _params);
+  }
+
+  Future futures_change_position_mode() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.post, 'positionSide/dual', signed: true, params: _params);
+  }
+
+  Future futures_get_position_mode() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesApi(HttpMethod.get, 'positionSide/dual', signed: true, params: _params);
+  }
+
+  Future futures_change_multi_assets_mode(bool multiAssetsMargin) async {
+    final Map<String, dynamic> _params = {'multiAssetsMargin': multiAssetsMargin}; // TODO: check '$multiAssetsMargin'
+    return await requestFuturesApi(HttpMethod.post, 'multiAssetsMargin', signed: true, params: _params);
+  }
+
+  Future futures_get_multi_assets_mode() async {
+    return await requestFuturesApi(HttpMethod.get, 'multiAssetsMargin', signed: true, params: {});
+  }
+
+  Future futures_stream_get_listen_key() =>
+      requestFuturesApi(HttpMethod.post, 'listenKey', signed: false, params: {}).then((r) => r['listenKey']);
+
+  Future futures_stream_keepAlive(String listenKey) async {
+    final Map<String, dynamic> _params = {'listenKey': listenKey};
+    return await requestFuturesApi(HttpMethod.put, 'listenKey', signed: false, params: _params);
+  }
+
+  Future futures_stream_close(String listenKey) async {
+    final Map<String, dynamic> _params = {'listenKey': listenKey};
+    return await requestFuturesApi(HttpMethod.delete, 'listenKey', signed: false, params: _params);
+  }
+
+  // COIN Futures API
+
+  Future futures_coin_ping() async {
+    return await requestFuturesCoinApi(HttpMethod.get, 'ping');
+  }
+
+  Future futures_coin_time() async {
+    return await requestFuturesCoinApi(HttpMethod.get, 'time');
+  }
+
+  Future futures_coin_exchange_info() async {
+    return await requestFuturesCoinApi(HttpMethod.get, 'exchangeInfo');
+  }
+
+  Future futures_coin_order_book() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'depth', params: _params);
+  }
+
+  Future futures_coin_recent_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'trades', params: _params);
+  }
+
+  Future futures_coin_historical_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'historicalTrades', params: _params);
+  }
+
+  Future futures_coin_aggregate_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'historicalTrades', params: _params);
+  }
+
+  Future futures_coin_klines() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'klines', params: _params);
+  }
+
+  Future futures_coin_continous_klines() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'continuousKlines', params: _params);
+  }
+
+  Future futures_coin_index_price_klines() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'indexPriceKlines', params: _params);
+  }
+
+  Future futures_coin_mark_price_klines() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'markPriceKlines', params: _params);
+  }
+
+  Future futures_coin_mark_price() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'premiumIndex', params: _params);
+  }
+
+  Future futures_coin_funding_rate() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'fundingRate', params: _params);
+  }
+
+  Future futures_coin_ticker() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'ticker/24hr', params: _params);
+  }
+
+  Future futures_coin_symbol_ticker() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'ticker/price', params: _params);
+  }
+
+  Future futures_coin_orderbook_ticker() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'ticker/bookTicker', params: _params);
+  }
+
+  Future futures_coin_liquidation_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'forceOrders', params: _params);
+  }
+
+  Future futures_coin_open_interest() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'openInterest', params: _params);
+  }
+
+  Future futures_coin_open_interest_hist() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'openInterestHist', params: _params);
+  }
+
+  Future futures_coin_leverage_bracket() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'leverageBracket', signed: true, version: 2, params: _params);
+  }
+
+  Future new_transfer_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'asset/transfer', signed: true, params: _params);
+  }
+
+  Future universal_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'asset/transfer', signed: true, params: _params);
+  }
+
+  Future futures_coin_create_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'order', signed: true, params: _params);
+  }
+
+  Future futures_coin_place_batch_order() async {
+    // TODO: not done
+    // query_string = urlencode(params)
+    // query_string = query_string.replace('%27', '%22')
+    // params['batchOrders'] = query_string[12:]
+
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'batchOrders', signed: true, params: _params);
+  }
+
+  Future futures_coin_get_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'order', signed: true, params: _params);
+  }
+
+  Future futures_coin_get_open_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'openOrders', signed: true, params: _params);
+  }
+
+  Future futures_coin_get_all_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'allOrders', signed: true, params: _params);
+  }
+
+  Future futures_coin_cancel_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.delete, 'order', signed: true, params: _params);
+  }
+
+  Future futures_coin_cancel_all_open_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.delete, 'allOpenOrders', signed: true, params: _params);
+  }
+
+  Future futures_coin_cancel_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.delete, 'batchOrders', signed: true, params: _params);
+  }
+
+  Future futures_coin_account_balance() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'balance', signed: true, params: _params);
+  }
+
+  Future futures_coin_account() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'account', signed: true, params: _params);
+  }
+
+  Future futures_coin_change_leverage() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'leverage', signed: true, params: _params);
+  }
+
+  Future futures_coin_change_margin_type() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'marginType', signed: true, params: _params);
+  }
+
+  Future futures_coin_change_position_margin() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'positionMargin', signed: true, params: _params);
+  }
+
+  Future futures_coin_position_margin_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'positionMargin/history', signed: true, params: _params);
+  }
+
+  Future futures_coin_position_information() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'positionRisk', signed: true, params: _params);
+  }
+
+  Future futures_coin_account_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'userTrades', signed: true, params: _params);
+  }
+
+  Future futures_coin_income_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'income', signed: true, params: _params);
+  }
+
+  Future futures_coin_change_position_mode() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'positionSide/dual', signed: true, params: _params);
+  }
+
+  Future futures_coin_get_position_mode() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'positionSide/dual', signed: true, params: _params);
+  }
+
+  Future futures_coin_stream_get_listen_key() =>
+      requestFuturesCoinApi(HttpMethod.post, 'listenKey', signed: false, params: {}).then((r) => r['listenKey']);
+
+  Future futures_coin_stream_keepAlive(String listenKey) async {
+    final Map<String, dynamic> _params = {'listenKey': listenKey};
+    return await requestFuturesCoinApi(HttpMethod.put, 'listenKey', signed: false, params: _params);
+  }
+
+  Future futures_coin_stream_close(String listenKey) async {
+    final Map<String, dynamic> _params = {'listenKey': listenKey};
+    return await requestFuturesCoinApi(HttpMethod.delete, 'listenKey', signed: false, params: _params);
+  }
+
+  Future get_all_coins_info() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'capital/config/getall', signed: true, params: _params);
+  }
+
+  Future get_account_snapshot() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.get, 'accountSnapshot', signed: true, params: _params);
+  }
+
+  Future disable_fast_withdraw_switch() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'disableFastWithdrawSwitch', signed: true, params: _params);
+  }
+
+  Future enable_fast_withdraw_switch() async {
+    final Map<String, dynamic> _params = {};
+    return await requestFuturesCoinApi(HttpMethod.post, 'enableFastWithdrawSwitch', signed: true, params: _params);
+  }
+
+  /// =================================================================================================================
+  /// Options API
+  /// =================================================================================================================
+
+  // Quoting interface endpoints
+
+  Future options_ping() async {
+    return await requestOptionsApi(HttpMethod.get, 'ping');
+  }
+
+  Future options_time() async {
+    return await requestOptionsApi(HttpMethod.get, 'time');
+  }
+
+  Future options_info() async {
+    return await requestOptionsApi(HttpMethod.get, 'optionInfo');
+  }
+
+  Future options_exchange_info() async {
+    return await requestOptionsApi(HttpMethod.get, 'exchangeInfo');
+  }
+
+  Future options_index_price() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'index', params: _params);
+  }
+
+  Future options_price() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'ticker', params: _params);
+  }
+
+  Future options_mark_price() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'mark', params: _params);
+  }
+
+  Future options_order_book() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'depth', params: _params);
+  }
+
+  Future options_klines() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'klines', params: _params);
+  }
+
+  Future options_recent_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'trades', params: _params);
+  }
+
+  Future options_historical_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'historicalTrades', params: _params);
+  }
+
+  // Account and trading interface endpoints
+
+  Future options_account_info() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'account', signed: true, params: _params);
+  }
+
+  Future options_funds_transfer() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.post, 'transfer', signed: true, params: _params);
+  }
+
+  Future options_positions() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'position', signed: true, params: _params);
+  }
+
+  Future options_bill() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.post, 'bill', signed: true, params: _params);
+  }
+
+  Future options_place_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.post, 'order', signed: true, params: _params);
+  }
+
+  Future options_place_batch_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.post, 'batchOrders', signed: true, params: _params);
+  }
+
+  Future options_cancel_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.delete, 'order', signed: true, params: _params);
+  }
+
+  Future options_cancel_batch_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.delete, 'batchOrders', signed: true, params: _params);
+  }
+
+  Future options_cancel_all_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.delete, 'allOpenOrders', signed: true, params: _params);
+  }
+
+  Future options_query_order() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'order', signed: true, params: _params);
+  }
+
+  Future options_query_pending_orders() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'openOrders', signed: true, params: _params);
+  }
+
+  Future options_query_order_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'historyOrders', signed: true, params: _params);
+  }
+
+  Future options_user_trades() async {
+    final Map<String, dynamic> _params = {};
+    return await requestOptionsApi(HttpMethod.get, 'userTrades', signed: true, params: _params);
+  }
+
+  // Fiat Endpoints
+
+  Future get_fiat_deposit_withdraw_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'fiat/orders', signed: true, params: _params);
+  }
+
+  Future get_fiat_payments_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'fiat/payments', signed: true, params: _params);
+  }
+
+  // C2C Endpoints
+
+  Future get_c2c_trade_history() async {
+    final Map<String, dynamic> _params = {};
+    return await requestMarginApi(HttpMethod.get, 'c2c/orderMatch/listUserOrderHistory', signed: true, params: _params);
+  }
 }

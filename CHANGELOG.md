@@ -5,12 +5,12 @@
 |         |            | Comments                                             |
 |         |            | Not serialized data for compute                      |
 |         |            | Serialized data                                      |
-| 0.0.10  |            | C2C Endpoints                                        |
-| 0.0.10  |            | Fiat Endpoints                                       |
-| 0.0.9a  |            | Options API: Account and trading interface endpoints |
-|  0.0.9  |            | Options API: Quoting interface endpoints             |
-|  0.0.8  |            | COIN Futures API                                     |
-|  0.0.7  |            | Futures API                                          |
+| 0.0.10a | 18.10.2022 | C2C Endpoints  (All python methods migrated)         |
+| 0.0.10  | 18.10.2022 | Fiat Endpoints                                       |
+| 0.0.9a  | 18.10.2022 | Options API: Account and trading interface endpoints |
+|  0.0.9  | 18.10.2022 | Options API: Quoting interface endpoints             |
+|  0.0.8  | 18.10.2022 | COIN Futures API                                     |
+|  0.0.7  | 18.10.2022 | Futures API                                          |
 |  0.0.6  | 17.10.2022 | Sub Accounts                                         |
 |  0.0.6  | 17.10.2022 | Lending Endpoints                                    |
 |  0.0.6  | 17.10.2022 | Margin OCO, Cross-margin, Isolated margin stream     |
