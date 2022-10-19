@@ -23,34 +23,34 @@ class BnApi extends BaseClient {
   // General Endpoints
   Future<bool> ping() => get('ping', version: BnApiUrls.privateApiVersion).then((r) => true);
 
-  Future<int> getServerTime() => get('time', version: BnApiUrls.privateApiVersion).then((r) => r['serverTime']);
+  Future<int> getServerTime() => get('time', version: BnApiUrls.privateApiVersion).then((r) => r.json['serverTime']);
 
   // Exchange Endpoints
-  Future getProducts() => requestWebsite(HttpMethod.get, BnApiUrls.exchangeProducts).then((r) => r);
+  Future<ApiResponse> getProducts() => requestWebsite(HttpMethod.get, BnApiUrls.exchangeProducts).then((r) => r);
 
-  Future getExchangeInfo() => get('exchangeInfo', version: BnApiUrls.privateApiVersion).then((r) => r);
+  Future<ApiResponse> getExchangeInfo() => get('exchangeInfo', version: BnApiUrls.privateApiVersion).then((r) => r);
 
-  Future getSymbolInfo(String symbol) =>
-      getExchangeInfo().then((value) => value['symbols'].firstWhere((e) => e['symbol'] == symbol.toUpperCase()));
+  Future<ApiResponse> getSymbolInfo(String symbol) =>
+      getExchangeInfo().then((r) => r.json['symbols'].firstWhere((e) => e['symbol'] == symbol.toUpperCase()));
 
   // Market Data Endpoints
-  Future getAllTickers() => get('ticker/price', version: BnApiUrls.privateApiVersion).then((r) => r);
+  Future<ApiResponse> getAllTickers() => get('ticker/price', version: BnApiUrls.privateApiVersion).then((r) => r);
 
-  Future getTicker(String symbol) =>
+  Future<ApiResponse> getTicker(String symbol) =>
       get('ticker/price', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol}).then((r) => r);
 
-  Future getOrderBookTickers(String symbol) =>
+  Future<ApiResponse> getOrderBookTickers(String symbol) =>
       get('ticker/bookTicker', version: BnApiUrls.privateApiVersion).then((r) => r);
 
-  Future getOrderBook(Map<String, dynamic> params) =>
+  Future<ApiResponse> getOrderBook(Map<String, dynamic> params) =>
       get('depth', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
 
-  Future getRecentTrades(Map<String, dynamic> params) => get('trades', params: params).then((r) => r);
+  Future<ApiResponse> getRecentTrades(Map<String, dynamic> params) => get('trades', params: params).then((r) => r);
 
-  Future getHistoricalTrades(Map<String, dynamic> params) =>
+  Future<ApiResponse> getHistoricalTrades(Map<String, dynamic> params) =>
       get('historicalTrades', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
 
-  Future getAggregateTrades(Map<String, dynamic> params) =>
+  Future<ApiResponse> getAggregateTrades(Map<String, dynamic> params) =>
       get('aggTrades', version: BnApiUrls.privateApiVersion, params: params).then((r) => r);
 
   Stream aggregateTradeIter(String symbol, String? startStr, int? lastID) async* {
@@ -63,7 +63,7 @@ class BnApi extends BaseClient {
       // Normally, we'd get rid of it. See the next loop.
       List trades = [];
       if (startStr == null) {
-        trades = await getAggregateTrades({'symbol': symbol, 'fromId': 0});
+        trades = await getAggregateTrades({'symbol': symbol, 'fromId': 0}).then((r) => r.json);
       } else {
         // The difference between startTime and endTime should be less
         // or equal than an hour and the result set should contain at least one trade.
@@ -73,7 +73,8 @@ class BnApi extends BaseClient {
         // then we just move forward hour by hour until we find at least on trade or reach present moment
         while (true) {
           endTs = startTs + (60 * 60 * 1000);
-          trades = await getAggregateTrades({'symbol': symbol, 'startTime': startTs, 'endTime': endTs});
+          trades =
+              await getAggregateTrades({'symbol': symbol, 'startTime': startTs, 'endTime': endTs}).then((r) => r.json);
           if (trades.isNotEmpty) break;
           // If we reach present moment and find no trades then there is
           // nothing to iterate, so we're done
@@ -92,7 +93,7 @@ class BnApi extends BaseClient {
         // only thread running calls like this, Binance will automatically
         // add the right delay time on their end, forcing us to wait for
         // data. That really simplifies this function's job. Binance is fucking awesome.
-        trades = await getAggregateTrades({'symbol': symbol, 'fromId': lastID});
+        trades = await getAggregateTrades({'symbol': symbol, 'fromId': lastID}).then((r) => r.json);
         // fromId=n returns a set starting with id n, but we already have that one.
         // So get rid of the first item in the result set.
         trades = trades.sublist(1);
@@ -105,7 +106,7 @@ class BnApi extends BaseClient {
     }
   }
 
-  Future getKLines(Map<String, dynamic> params) async {
+  Future<ApiResponse> getKLines(Map<String, dynamic> params) async {
     return await get('klines', version: BnApiUrls.privateApiVersion, params: params);
   }
 
@@ -133,7 +134,7 @@ class BnApi extends BaseClient {
     return kline[0][0];
   }
 
-  Future getHistoricalKLines(String symbol, int interval,
+  Future<ApiResponse> getHistoricalKLines(String symbol, int interval,
       {String? startStr, String? endStr, int limit = 1000, KLinesType kLinesType = KLinesType.spot}) async {
     return await _historicalKLines(symbol, interval,
         startStr: startStr, endStr: endStr, limit: limit, kLinesType: kLinesType);
@@ -550,9 +551,9 @@ class BnApi extends BaseClient {
 
   // User Stream Endpoints
 
-  Future stream_get_listen_key() async {
-    final result = await post('userDataStream', signed: false, params: {});
-    return result['listenKey'];
+  Future<String> stream_get_listen_key() async {
+    final _response = await post('userDataStream', signed: false, params: {});
+    return _response.json['listenKey'];
   }
 
   Future stream_keepAlive(String listenKey) async {
@@ -745,34 +746,35 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'margin/orderList', signed: true, params: _params);
   }
 
-  Future get_open_margin_oco_orders() async {
+  Future<ApiResponse> get_open_margin_oco_orders() async {
     final Map<String, dynamic> _params = {};
     return await requestMarginApi(HttpMethod.get, 'margin/allOrderList', signed: true, params: _params);
   }
 
   // Cross-margin
 
-  Future margin_stream_get_listen_key() async {
+  Future<String> margin_stream_get_listen_key() async {
     final _response = await requestMarginApi(HttpMethod.post, 'userDataStream', signed: false, params: {});
-    return _response['listenKey'];
+    return _response.json['listenKey'];
   }
 
-  Future margin_stream_keepAlive(String listenKey) async {
+  Future<ApiResponse> margin_stream_keepAlive(String listenKey) async {
     final Map<String, dynamic> _params = {'listenKey': listenKey};
     return await requestMarginApi(HttpMethod.put, 'userDataStream', signed: false, params: _params);
   }
 
-  Future margin_stream_close(String listenKey) async {
+  Future<ApiResponse> margin_stream_close(String listenKey) async {
     final Map<String, dynamic> _params = {'listenKey': listenKey};
     return await requestMarginApi(HttpMethod.delete, 'userDataStream', signed: false, params: _params);
   }
 
   // Isolated margin
 
-  Future isolated_margin_stream_get_listen_key(String symbol) async {
+  Future<String> isolated_margin_stream_get_listen_key(String symbol) async {
     final Map<String, dynamic> _params = {'symbol': symbol};
-    final _res = await requestMarginApi(HttpMethod.post, 'userDataStream/isolated', signed: false, params: _params);
-    return _res['listenKey'];
+    final _response =
+        await requestMarginApi(HttpMethod.post, 'userDataStream/isolated', signed: false, params: _params);
+    return _response.json['listenKey'];
   }
 
   Future isolated_margin_stream_keepAlive(String symbol, String listenKey) async {
@@ -1200,8 +1202,8 @@ class BnApi extends BaseClient {
     return await requestFuturesApi(HttpMethod.get, 'multiAssetsMargin', signed: true, params: {});
   }
 
-  Future futures_stream_get_listen_key() =>
-      requestFuturesApi(HttpMethod.post, 'listenKey', signed: false, params: {}).then((r) => r['listenKey']);
+  Future<String> futures_stream_get_listen_key() =>
+      requestFuturesApi(HttpMethod.post, 'listenKey', signed: false, params: {}).then((r) => r.json['listenKey']);
 
   Future futures_stream_keepAlive(String listenKey) async {
     final Map<String, dynamic> _params = {'listenKey': listenKey};
@@ -1377,53 +1379,53 @@ class BnApi extends BaseClient {
     return await requestFuturesCoinApi(HttpMethod.get, 'account', signed: true, params: _params);
   }
 
-  Future futures_coin_change_leverage() async {
+  Future<ApiResponse> futures_coin_change_leverage() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.post, 'leverage', signed: true, params: _params);
   }
 
-  Future futures_coin_change_margin_type() async {
+  Future<ApiResponse> futures_coin_change_margin_type() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.post, 'marginType', signed: true, params: _params);
   }
 
-  Future futures_coin_change_position_margin() async {
+  Future<ApiResponse> futures_coin_change_position_margin() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.post, 'positionMargin', signed: true, params: _params);
   }
 
-  Future futures_coin_position_margin_history() async {
+  Future<ApiResponse> futures_coin_position_margin_history() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.get, 'positionMargin/history', signed: true, params: _params);
   }
 
-  Future futures_coin_position_information() async {
+  Future<ApiResponse> futures_coin_position_information() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.get, 'positionRisk', signed: true, params: _params);
   }
 
-  Future futures_coin_account_trades() async {
+  Future<ApiResponse> futures_coin_account_trades() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.get, 'userTrades', signed: true, params: _params);
   }
 
-  Future futures_coin_income_history() async {
+  Future<ApiResponse> futures_coin_income_history() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.get, 'income', signed: true, params: _params);
   }
 
-  Future futures_coin_change_position_mode() async {
+  Future<ApiResponse> futures_coin_change_position_mode() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.post, 'positionSide/dual', signed: true, params: _params);
   }
 
-  Future futures_coin_get_position_mode() async {
+  Future<ApiResponse> futures_coin_get_position_mode() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.get, 'positionSide/dual', signed: true, params: _params);
   }
 
-  Future futures_coin_stream_get_listen_key() =>
-      requestFuturesCoinApi(HttpMethod.post, 'listenKey', signed: false, params: {}).then((r) => r['listenKey']);
+  Future<String> futures_coin_stream_get_listen_key() =>
+      requestFuturesCoinApi(HttpMethod.post, 'listenKey', signed: false, params: {}).then((r) => r.json['listenKey']);
 
   Future futures_coin_stream_keepAlive(String listenKey) async {
     final Map<String, dynamic> _params = {'listenKey': listenKey};

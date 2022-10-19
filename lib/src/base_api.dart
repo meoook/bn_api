@@ -6,6 +6,18 @@ import 'package:crypto/crypto.dart';
 import 'constants.dart';
 import 'objects.dart';
 
+class ApiResponse {
+  final String data;
+  dynamic _json;
+
+  ApiResponse(this.data);
+
+  dynamic get json {
+    if (_json == null) _json = jsonDecode(data);
+    return _json;
+  }
+}
+
 class BaseClient {
   static const Duration requestTimeout = Duration(seconds: 10);
 
@@ -82,7 +94,7 @@ class BaseClient {
     }
   }
 
-  Future _request(HttpMethod method, String uriHost, String uriPath, bool signed,
+  Future<ApiResponse> _request(HttpMethod method, String uriHost, String uriPath, bool signed,
       [Map<String, dynamic>? params]) async {
     final Map<String, dynamic> _reqParams = _getRequestArguments(signed, params);
     final Uri _uri = (method == HttpMethod.get) ? Uri.https(uriHost, uriPath, _reqParams) : Uri.https(uriHost, uriPath);
@@ -92,81 +104,77 @@ class BaseClient {
     try {
       response = await _doRequest(method, _uri, params);
     } on SocketException catch (_err) {
-      throw BinanceApiException(500, '$_err');
+      throw BinanceApiException("{'code': 500, 'message': 'Socket error - $_err'}");
     }
-    var jsonData;
-    try {
-      jsonData = jsonDecode(response.body);
-    } catch (_err) {
-      throw BinanceApiException(555, '$_err');
-    }
-    if (response.statusCode >= 300) throw BinanceApiException(jsonData["code"], jsonData["msg"]);
-    return jsonData;
+    if (response.statusCode >= 300) throw BinanceApiException(response.body);
+    return ApiResponse(response.body);
   }
 
-  Future requestApi(HttpMethod method, String uriPath,
+  Future<ApiResponse> requestApi(HttpMethod method, String uriPath,
       {bool signed = false, String? version, Map<String, dynamic>? params}) async {
     final String _uriHost = testnet ? BnApiUrls.apiUrlTestnet : BnApiUrls.apiUrl;
     final String _version = signed ? BnApiUrls.privateApiVersion : version ?? BnApiUrls.publicApiVersion;
     return await _request(method, _uriHost, 'api/$_version/$uriPath', signed, params);
   }
 
-  Future requestFuturesApi(HttpMethod method, String uriPath,
+  Future<ApiResponse> requestFuturesApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
     final String _uriHost = testnet ? BnApiUrls.futuresUrlTestnet : BnApiUrls.futuresUrl;
     return await _request(method, _uriHost, 'fapi/${BnApiUrls.futuresApiVersion}/$uriPath', signed, params);
   }
 
-  Future requestFuturesDataApi(HttpMethod method, String uriPath,
+  Future<ApiResponse> requestFuturesDataApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
     final String _uriHost = testnet ? BnApiUrls.futuresUrlTestnet : BnApiUrls.futuresUrl;
     return await _request(method, _uriHost, 'futures/data/$uriPath', signed, params);
   }
 
-  Future requestFuturesCoinApi(HttpMethod method, String uriPath,
+  Future<ApiResponse> requestFuturesCoinApi(HttpMethod method, String uriPath,
       {bool signed = false, int version = 1, Map<String, dynamic>? params}) async {
     final String _uriHost = testnet ? BnApiUrls.futuresCoinUrlTestnet : BnApiUrls.futuresCoinUrl;
     final String _version = version == 1 ? BnApiUrls.futuresApiVersion : BnApiUrls.futuresApiVersion2;
     return await _request(method, _uriHost, 'dapi/$_version/$uriPath', signed, params);
   }
 
-  Future requestFuturesCoinDataApi(HttpMethod method, String uriPath,
+  Future<ApiResponse> requestFuturesCoinDataApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
     final String _uriHost = testnet ? BnApiUrls.futuresCoinUrlTestnet : BnApiUrls.futuresCoinUrl;
     return await _request(method, _uriHost, 'futures/data/$uriPath', signed, params);
   }
 
-  Future requestOptionsApi(HttpMethod method, String uriPath,
+  Future<ApiResponse> requestOptionsApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
     final String _uriHost = testnet ? BnApiUrls.optionsUrlTestnet : BnApiUrls.optionsUrl;
     return await _request(method, _uriHost, 'vapi/${BnApiUrls.optionsApiVersion}/$uriPath', signed, params);
   }
 
-  Future requestMarginApi(HttpMethod method, String uriPath,
+  Future<ApiResponse> requestMarginApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
     return await _request(method, BnApiUrls.apiUrl, 'sapi/${BnApiUrls.optionsApiVersion}/$uriPath', signed, params);
   }
 
-  Future requestWebsite(HttpMethod method, String uriPath, {bool signed = false, Map<String, dynamic>? params}) async {
+  Future<ApiResponse> requestWebsite(HttpMethod method, String uriPath,
+      {bool signed = false, Map<String, dynamic>? params}) async {
     return await _request(method, BnApiUrls.webUrl, uriPath, signed, params);
   }
 
-  Future get(String uriPath, {bool signed = false, String? version, Map<String, dynamic>? params}) async {
+  Future<ApiResponse> get(String uriPath, {bool signed = false, String? version, Map<String, dynamic>? params}) async {
     final String _version = version ?? BnApiUrls.publicApiVersion;
     return await requestApi(HttpMethod.get, uriPath, signed: signed, version: _version, params: params);
   }
 
-  Future post(String uriPath, {bool signed = false, String? version, Map<String, dynamic>? params}) async {
+  Future<ApiResponse> post(String uriPath, {bool signed = false, String? version, Map<String, dynamic>? params}) async {
     final String _version = version ?? BnApiUrls.publicApiVersion;
     return await requestApi(HttpMethod.post, uriPath, signed: signed, version: _version, params: params);
   }
 
-  Future put(String uriPath, {bool signed = false, String? version, Map<String, dynamic>? params}) async {
+  Future<ApiResponse> put(String uriPath, {bool signed = false, String? version, Map<String, dynamic>? params}) async {
     final String _version = version ?? BnApiUrls.publicApiVersion;
     return await requestApi(HttpMethod.put, uriPath, signed: signed, version: _version, params: params);
   }
 
-  Future delete(String uriPath, {bool signed = false, String? version, Map<String, dynamic>? params}) async {
+  Future<ApiResponse> delete(String uriPath,
+      {bool signed = false, String? version, Map<String, dynamic>? params}) async {
     final String _version = version ?? BnApiUrls.publicApiVersion;
     return await requestApi(HttpMethod.delete, uriPath, signed: signed, version: _version, params: params);
   }
