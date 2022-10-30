@@ -30,8 +30,8 @@ class BnApi extends BaseClient {
 
   Future<ApiResponse> getExchangeInfo() => get('exchangeInfo', version: BnApiUrls.privateApiVersion).then((r) => r);
 
-  Future<ApiResponse> getSymbolInfo(String symbol) =>
-      getExchangeInfo().then((r) => r.json['symbols'].firstWhere((e) => e['symbol'] == symbol.toUpperCase()));
+  // Future<ApiResponse> getSymbolInfo(String symbol) =>
+  //     getExchangeInfo().then((r) => r.json['symbols'].firstWhere((e) => e['symbol'] == symbol.toUpperCase()));
 
   // Market Data Endpoints
   Future<ApiResponse> getAllTickers() => get('ticker/price', version: BnApiUrls.privateApiVersion).then((r) => r);
@@ -477,7 +477,7 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'account/apiTradingStatus', signed: true);
   }
 
-  Future get_account_api_permissions() async {
+  Future getAccountApiPermissions() async {
     return await requestMarginApi(HttpMethod.get, 'account/apiRestrictions', signed: true);
   }
 

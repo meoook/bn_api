@@ -4,7 +4,8 @@
 |         |            | Tests                                                |
 |         |            | Comments                                             |
 |         |            | Not serialized data for compute                      |
-|         |            | Serialized data                                      |
+|         |            | Serialized client                                    |
+|  0.1.2  | 30.10.2022 | Objects: Exchange Info and Permissions               |
 |  0.1.1  | 19.10.2022 | Objects: Products                                    |
 | 0.0.10a | 18.10.2022 | C2C Endpoints  (All python methods migrated)         |
 | 0.0.10  | 18.10.2022 | Fiat Endpoints                                       |

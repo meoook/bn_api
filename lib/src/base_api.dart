@@ -97,12 +97,14 @@ class BaseClient {
   Future<ApiResponse> _request(HttpMethod method, String uriHost, String uriPath, bool signed,
       [Map<String, dynamic>? params]) async {
     final Map<String, dynamic> _reqParams = _getRequestArguments(signed, params);
-    final Uri _uri = (method == HttpMethod.get) ? Uri.https(uriHost, uriPath, _reqParams) : Uri.https(uriHost, uriPath);
-    print('Request $_uri');
+    print('Request ${method.name.toUpperCase()} $uriHost/$uriPath $_reqParams');
+    final Uri _uri = (method == HttpMethod.get)
+        ? Uri.https(uriHost, uriPath, _reqParams.map((key, value) => MapEntry(key, '$value')))
+        : Uri.https(uriHost, uriPath);
 
     http.Response response;
     try {
-      response = await _doRequest(method, _uri, params);
+      response = await _doRequest(method, _uri, _reqParams);
     } on SocketException catch (_err) {
       throw BinanceApiException("{'code': 500, 'message': 'Socket error - $_err'}");
     }

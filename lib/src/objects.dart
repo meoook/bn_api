@@ -1,4 +1,5 @@
 import 'dart:convert';
+export 'objects/exchange_info.dart';
 
 enum KLinesType { spot, futures, futuresCoin }
 
@@ -57,7 +58,7 @@ class SymbolProduct {
   // final bool icebergAllowed;
   // List<Filter> filters;
 
-  SymbolProduct.fromJson(Map m)
+  SymbolProduct(Map m)
       : symbol = m['s'],
         status = statusMap[m['st']]!,
         open = m['o'],
