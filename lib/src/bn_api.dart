@@ -440,16 +440,14 @@ class BnApi extends BaseClient {
 
   /// Get current account information.
   /// https://binance-docs.github.io/apidocs/spot/en/#account-information-user_data
-  Future get_account() async {
-    return await get('account', signed: true);
-  }
+  Future getAccount() => get('account', signed: true);
 
   /// Get balance for selected asset/coin
   ///  "asset": "BTC",
   ///  "free": "4723846.89208129",
   ///  "locked": "0.00000000"
   Future<Map<String, dynamic>?> getAssetBalance(String asset) async {
-    final Map _res = await get_account();
+    final Map _res = await getAccount();
     if (_res.containsKey('balances')) {
       final List<Map<String, dynamic>> _balances = _res['balances'];
       final _balancesIterator = _balances.iterator;
@@ -669,8 +667,16 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.post, 'margin/order', signed: true, params: _params);
   }
 
-  Future cancel_margin_order() async {
-    final Map<String, dynamic> _params = {};
+  /// https://binance-docs.github.io/apidocs/spot/en/#margin-account-cancel-order-trade
+  Future cancelMarginOrder(
+      {String? symbol, bool? isIsolated, int? orderId, String? origClientOrderId, String? newClientOrderId}) async {
+    final Map<String, dynamic> _params = {
+      if (symbol != null) 'symbol': symbol,
+      if (isIsolated != null) 'isIsolated': isIsolated,
+      if (orderId != null) 'orderId': orderId,
+      if (origClientOrderId != null) 'origClientOrderId': origClientOrderId,
+      if (newClientOrderId != null) 'newClientOrderId': newClientOrderId
+    };
     return await requestMarginApi(HttpMethod.delete, 'margin/order', signed: true, params: _params);
   }
 
@@ -699,16 +705,29 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'margin/forceLiquidationRec', signed: true, params: _params);
   }
 
-  Future get_margin_order() async {
-    final Map<String, dynamic> _params = {};
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-margin-account-39-s-order-user_data
+  /// Either [orderId] or [origClientOrderId] must be sent.
+  Future getMarginOrder({String? symbol, bool? isIsolated, int? orderId, String? origClientOrderId}) async {
+    final Map<String, dynamic> _params = {
+      if (symbol != null) 'symbol': symbol,
+      if (isIsolated != null) 'isIsolated': isIsolated,
+      if (orderId != null) 'orderId': orderId,
+      if (origClientOrderId != null) 'origClientOrderId': origClientOrderId
+    };
     return await requestMarginApi(HttpMethod.get, 'margin/order', signed: true, params: _params);
   }
 
-  Future get_open_margin_orders() async {
-    final Map<String, dynamic> _params = {};
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-margin-account-39-s-open-orders-user_data
+  /// [symbol] is mandatory for isolated margin
+  Future getOpenMarginOrders({String? symbol, bool? isIsolated}) async {
+    final Map<String, dynamic> _params = {
+      if (symbol != null) 'symbol': symbol,
+      if (isIsolated != null) 'isIsolated': isIsolated
+    };
     return await requestMarginApi(HttpMethod.get, 'margin/openOrders', signed: true, params: _params);
   }
 
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-margin-account-39-s-all-orders-user_data
   Future get_all_margin_orders() async {
     final Map<String, dynamic> _params = {};
     return await requestMarginApi(HttpMethod.get, 'margin/allOrders', signed: true, params: _params);

@@ -26,7 +26,7 @@ class BinanceApiException implements Exception {
     try {
       final _json = jsonDecode(data);
       code = _json['code'];
-      message = _json['message'];
+      message = _json['msg'];
     } catch (e) {
       code = 600;
       message = 'Fail to serialize error to JSON';

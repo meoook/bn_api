@@ -41,7 +41,7 @@ class BaseClient {
 
   Map<String, String> get _headers {
     Map<String, String> headers = {
-      HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      // HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.acceptHeader: 'application/json',
       // 'Accept': 'application/json',
       // "HTTP_ACCEPT_LANGUAGE": "en-US",
@@ -71,7 +71,7 @@ class BaseClient {
     // add requests params
     if (params != null && params.isNotEmpty) _result.addAll(params);
     // remove null or empty values
-    _result.removeWhere((_, value) => value == null || value.isEmpty);
+    // _result.removeWhere((_, value) => value == null || value.isEmpty);
     // if signed generate signature
     if (signed) {
       _result['timestamp'] = DateTime.now().add(timeOffset).millisecondsSinceEpoch;

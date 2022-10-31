@@ -92,7 +92,7 @@ class SymbolFilters {
 }
 
 class SymbolInfo {
-  final String name;
+  final String symbol;
   final String status; // TRADING,
   final String baseAsset;
   final int baseAssetPrecision;
@@ -113,7 +113,7 @@ class SymbolInfo {
   final List<String> permissions;
 
   SymbolInfo(Map m)
-      : name = m['symbol'],
+      : symbol = m['symbol'],
         status = m['status'],
         baseAsset = m['baseAsset'],
         baseAssetPrecision = m['baseAssetPrecision'],
@@ -135,7 +135,7 @@ class SymbolInfo {
 
   @override
   String toString() {
-    return '$name $status';
+    return '$symbol $status';
   }
 }
 
@@ -176,5 +176,5 @@ class ExchangeInfo {
     return '$timezone $serverTime $rateLimits';
   }
 
-  SymbolInfo getSymbolInfo(String symbol) => symbols.firstWhere((e) => e.name == symbol);
+  SymbolInfo getSymbolInfo(String symbol) => symbols.firstWhere((e) => e.symbol == symbol.toUpperCase());
 }
