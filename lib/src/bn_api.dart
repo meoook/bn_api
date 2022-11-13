@@ -1,5 +1,4 @@
 import 'base_api.dart';
-import 'constants.dart';
 import 'objects.dart';
 
 class BnApi extends BaseClient {
@@ -28,7 +27,7 @@ class BnApi extends BaseClient {
   // Exchange Endpoints
   Future<ApiResponse> getProducts() => requestWebsite(HttpMethod.get, BnApiUrls.exchangeProducts).then((r) => r);
 
-  Future<ApiResponse> getExchangeInfo() => get('exchangeInfo', version: BnApiUrls.privateApiVersion).then((r) => r);
+  Future<ApiResponse> getExchangeInfo() => get('exchangeInfo', version: BnApiUrls.privateApiVersion);
 
   // Future<ApiResponse> getSymbolInfo(String symbol) =>
   //     getExchangeInfo().then((r) => r.json['symbols'].firstWhere((e) => e['symbol'] == symbol.toUpperCase()));
@@ -106,61 +105,24 @@ class BnApi extends BaseClient {
     }
   }
 
-  Future<ApiResponse> getKLines(Map<String, dynamic> params) async {
+  /// Kline/candlestick SPOT/MARGIN bars for a symbol.
+  /// https://binance-docs.github.io/apidocs/spot/en/#kline-candlestick-data
+  /// Klines are uniquely identified by their open time.
+  Future getKLines(String symbol, String interval, {int? limit, int? startTime, int? endTime}) async {
+    final params = {
+      'symbol': symbol,
+      'interval': interval, // TimeFrame
+      if (limit != null) 'limit': limit, // Default 500; max 1000
+      if (startTime != null) 'startTime': startTime, // 0
+      if (endTime != null) 'endTime': endTime, // DateTime.now().millisecondsSinceEpoch
+    };
     return await get('klines', version: BnApiUrls.privateApiVersion, params: params);
   }
 
-  Future _kLines(Map<String, dynamic> params, {KLinesType kLinesType = KLinesType.spot}) async {
-    if (params.containsKey('endTime') && params['endTime'].isEmpty) params.remove('endTime');
-    switch (kLinesType) {
-      case KLinesType.spot:
-        return await getKLines(params);
-      // case KLinesType.futures:
-      //   return await futuresKlines(params);
-      // case KLinesType.futuresCoin:
-      //   return await futuresCoinKlines(params);
-    }
-  }
-
-  Future _getEarliestValidTimestamp(String symbol, int interval, {KLinesType kLinesType = KLinesType.spot}) async {
-    final params = {
-      'symbol': symbol,
-      'interval': interval,
-      'limit': 1,
-      'startTime': 0,
-      'endTime': DateTime.now().millisecondsSinceEpoch
-    };
-    var kline = await _kLines(params, kLinesType: kLinesType);
-    return kline[0][0];
-  }
-
-  Future<ApiResponse> getHistoricalKLines(String symbol, int interval,
-      {String? startStr, String? endStr, int limit = 1000, KLinesType kLinesType = KLinesType.spot}) async {
-    return await _historicalKLines(symbol, interval,
-        startStr: startStr, endStr: endStr, limit: limit, kLinesType: kLinesType);
-  }
-
-  Future _historicalKLines(String symbol, int interval,
-      {String? startStr, String? endStr, int limit = 1000, KLinesType kLinesType = KLinesType.spot}) async {
-    // TODO: not implemented
-    // final outputData = [];
-    // timeframe = interval_to_milliseconds(interval)
-  }
-
-  Future getHistoricalKLinesGenerator(String symbol, int interval,
-      {String? startStr, String? endStr, int limit = 1000, KLinesType kLinesType = KLinesType.spot}) async {
-    return await _historicalKLinesGenerator(symbol, interval,
-        startStr: startStr, endStr: endStr, limit: limit, kLinesType: kLinesType);
-  }
-
-  Future _historicalKLinesGenerator(String symbol, int interval,
-      {String? startStr, String? endStr, int limit = 1000, KLinesType kLinesType = KLinesType.spot}) async {
-    // TODO: not implemented
-  }
-
-  // TODO: set params
+  /// Current average price for a symbol.
+  /// https://binance-docs.github.io/apidocs/spot/en/#current-average-price
   Future getAvgPrice(String symbol) =>
-      get('avgPrice', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol}).then((r) => r);
+      get('avgPrice', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol});
 
   // TODO: set params
   Future getTicker24h(String symbol) =>
@@ -193,7 +155,7 @@ class BnApi extends BaseClient {
   ///     [trailingDelta] can be combined with [stopPrice].
   Future createOrder(
     String symbol,
-    String side,
+    String side, // BUY, SELL
     String orderType, {
     String? timeInForce,
     double? quantity,
@@ -231,10 +193,10 @@ class BnApi extends BaseClient {
     return await createOrder(
       symbol,
       side,
-      BnApiOrderType.orderTypeLimit,
+      BnApiOrderType.limit,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+      timeInForce: timeInForce ?? BnTimeInForce.gtc,
     );
   }
 
@@ -242,10 +204,10 @@ class BnApi extends BaseClient {
     return await createOrder(
       symbol,
       BaseClient.sideBuy,
-      BnApiOrderType.orderTypeLimit,
+      BnApiOrderType.limit,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+      timeInForce: timeInForce ?? BnTimeInForce.gtc,
     );
   }
 
@@ -253,10 +215,10 @@ class BnApi extends BaseClient {
     return await createOrder(
       symbol,
       BaseClient.sideSell,
-      BnApiOrderType.orderTypeLimit,
+      BnApiOrderType.limit,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+      timeInForce: timeInForce ?? BnTimeInForce.gtc,
     );
   }
 
@@ -264,10 +226,10 @@ class BnApi extends BaseClient {
     return await createOrder(
       symbol,
       side,
-      BnApiOrderType.orderTypeMarket,
+      BnApiOrderType.market,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+      timeInForce: timeInForce ?? BnTimeInForce.gtc,
     );
   }
 
@@ -275,10 +237,10 @@ class BnApi extends BaseClient {
     return await createOrder(
       symbol,
       BaseClient.sideBuy,
-      BnApiOrderType.orderTypeMarket,
+      BnApiOrderType.market,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+      timeInForce: timeInForce ?? BnTimeInForce.gtc,
     );
   }
 
@@ -286,10 +248,10 @@ class BnApi extends BaseClient {
     return await createOrder(
       symbol,
       BaseClient.sideSell,
-      BnApiOrderType.orderTypeMarket,
+      BnApiOrderType.market,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.timeInForceGtc,
+      timeInForce: timeInForce ?? BnTimeInForce.gtc,
     );
   }
 
@@ -343,7 +305,7 @@ class BnApi extends BaseClient {
   /// https://binance-docs.github.io/apidocs/spot/en/#test-new-order-trade
   Future createTestOrder(
     String symbol,
-    String side,
+    String side, // BUY, SELL
     String orderType, {
     String? timeInForce,
     double? quantity,
@@ -442,23 +404,6 @@ class BnApi extends BaseClient {
   /// https://binance-docs.github.io/apidocs/spot/en/#account-information-user_data
   Future getAccount() => get('account', signed: true);
 
-  /// Get balance for selected asset/coin
-  ///  "asset": "BTC",
-  ///  "free": "4723846.89208129",
-  ///  "locked": "0.00000000"
-  Future<Map<String, dynamic>?> getAssetBalance(String asset) async {
-    final Map _res = await getAccount();
-    if (_res.containsKey('balances')) {
-      final List<Map<String, dynamic>> _balances = _res['balances'];
-      final _balancesIterator = _balances.iterator;
-      while (_balancesIterator.moveNext()) {
-        final Map<String, dynamic> _balance = _balancesIterator.current;
-        if (_balance['asset'].toLowerCase() == asset.toLowerCase()) return _balance;
-      }
-    }
-    return null;
-  }
-
   Future get_my_trades() async {
     return await get('myTrades', signed: true);
   }
@@ -495,7 +440,7 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'asset/assetDividend', signed: true);
   }
 
-  Future make_universal_transfer() async {
+  Future make_universal_transfcreateMarginOrderer() async {
     return await requestMarginApi(HttpMethod.post, 'asset/transfer', signed: true);
   }
 
@@ -662,12 +607,44 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.post, 'margin/repay', signed: true, params: _params);
   }
 
-  Future create_margin_order() async {
-    final Map<String, dynamic> _params = {};
+  /// Post a new order for margin account.
+  /// https://binance-docs.github.io/apidocs/spot/en/#margin-account-new-order-trade
+  /// [timeInForce] required if limit order
+  Future createMarginOrder(
+    String symbol,
+    String side, // BUY,SELL
+    String orderType, {
+    bool? isIsolated,
+    String? timeInForce, // GTC,IOC,FOK
+    double? quantity,
+    double? quoteOrderQty,
+    double? price,
+    double? stopPrice, // Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
+    String? newClientOrderId, // A unique id among open orders. Automatically generated if not sent.
+    double? icebergQty, // Used with LIMIT, STOP_LOSS_LIMIT, and TAKE_PROFIT_LIMIT to create an iceberg order.
+    String? newOrderRespType, // Set the response JSON. ACK, RESULT, or FULL;
+    String? sideEffectType, // NO_SIDE_EFFECT, MARGIN_BUY, AUTO_REPAY; default NO_SIDE_EFFECT
+  }) async {
+    final _params = {
+      'symbol': symbol,
+      'side': side,
+      'type': orderType,
+      if (isIsolated != null) 'isIsolated': isIsolated,
+      if (timeInForce != null) 'timeInForce': timeInForce,
+      if (quantity != null) 'quantity': quantity,
+      if (quoteOrderQty != null) 'quoteOrderQty': quoteOrderQty,
+      if (price != null) 'price': price,
+      if (newClientOrderId != null) 'newClientOrderId': newClientOrderId,
+      if (stopPrice != null) 'stopPrice': stopPrice,
+      if (sideEffectType != null) 'sideEffectType': sideEffectType,
+      if (icebergQty != null) 'icebergQty': icebergQty,
+      if (newOrderRespType != null) 'newOrderRespType': newOrderRespType,
+    };
     return await requestMarginApi(HttpMethod.post, 'margin/order', signed: true, params: _params);
   }
 
   /// https://binance-docs.github.io/apidocs/spot/en/#margin-account-cancel-order-trade
+  /// Either [orderId] or [origClientOrderId] must be sent.
   Future cancelMarginOrder(
       {String? symbol, bool? isIsolated, int? orderId, String? origClientOrderId, String? newClientOrderId}) async {
     final Map<String, dynamic> _params = {
@@ -1024,17 +1001,6 @@ class BnApi extends BaseClient {
   Future futures_continous_kLines() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesApi(HttpMethod.get, 'continuousKlines', params: _params);
-  }
-
-  Future futures_historical_kLines(String symbol, int interval, String startStr,
-      [String? endStr, int limit = 500]) async {
-    return await _historicalKLines(symbol, interval,
-        startStr: startStr, endStr: endStr, limit: limit, kLinesType: KLinesType.futures);
-  }
-
-  Future futures_historical_kLines_generator(String symbol, int interval, String startStr, [String? endStr]) async {
-    return await _historicalKLinesGenerator(symbol, interval,
-        startStr: startStr, endStr: endStr, kLinesType: KLinesType.futures);
   }
 
   Future futures_mark_price() async {

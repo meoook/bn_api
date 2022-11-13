@@ -23,22 +23,27 @@ class BnApiUrls {
   static const String optionsApiVersion = 'v1';
 }
 
-class BnApiOrderType {
-  static const String orderTypeLimit = 'LIMIT';
-  static const String orderTypeMarket = 'MARKET';
-  static const String orderTypeStopLoss = 'STOP_LOSS';
-  static const String orderTypeStopLossLimit = 'STOP_LOSS_LIMIT';
-  static const String orderTypeTakeProfit = 'TAKE_PROFIT';
-  static const String orderTypeTakeProfitLimit = 'TAKE_PROFIT_LIMIT';
-  static const String orderTypeLimitMaker = 'LIMIT_MAKER';
+class BnApiOrderSide {
+  static const String buy = 'BUY';
+  static const String sell = 'SELL';
+}
 
-  static const String futureOrderTypeLimit = 'LIMIT';
-  static const String futureOrderTypeMarket = 'MARKET';
-  static const String futureOrderTypeStop = 'STOP';
-  static const String futureOrderTypeStopMARKET = 'STOP_MARKET';
-  static const String futureOrderTypeTakeProfit = 'TAKE_PROFIT';
-  static const String futureOrderTypeTakeProfitMarket = 'TAKE_PROFIT_MARKET';
-  static const String futureOrderTypeLimitMaker = 'LIMIT_MAKER';
+class BnApiOrderType {
+  static const String limit = 'LIMIT';
+  static const String market = 'MARKET';
+  static const String stopLoss = 'STOP_LOSS';
+  static const String stopLossLimit = 'STOP_LOSS_LIMIT';
+  static const String takeProfit = 'TAKE_PROFIT';
+  static const String takeProfitLimit = 'TAKE_PROFIT_LIMIT';
+  static const String limitMaker = 'LIMIT_MAKER';
+
+  static const String futureLimit = 'LIMIT';
+  static const String futureMarket = 'MARKET';
+  static const String futureStop = 'STOP';
+  static const String futureStopMARKET = 'STOP_MARKET';
+  static const String futureTakeProfit = 'TAKE_PROFIT';
+  static const String futureTakeProfitMarket = 'TAKE_PROFIT_MARKET';
+  static const String futureLimitMaker = 'LIMIT_MAKER';
 }
 
 class BnAggKeys {
@@ -54,7 +59,31 @@ class BnAggKeys {
 }
 
 class BnTimeInForce {
-  static const String timeInForceGtc = 'GTC'; // Good till cancelled
-  static const String timeInForceIoc = 'IOC'; // Immediate or cancel
-  static const String timeInForceFok = 'FOK'; // Fill or kill
+  static const String gtc = 'GTC'; // Good till cancelled
+  static const String ioc = 'IOC'; // Immediate or cancel
+  static const String fok = 'FOK'; // Fill or kill
+}
+
+class BnApiOrderSideEffect {
+  static const String no_side = 'NO_SIDE_EFFECT'; // For normal trade order
+  static const String margin = 'MARGIN_BUY'; // For margin trade order
+  static const String auto = 'AUTO_REPAY'; // For making auto repayment after order filled
+}
+
+class BnApiTimeFrame {
+  static const String min1 = '1m';
+  static const String min3 = '3m';
+  static const String min5 = '5m';
+  static const String min15 = '15m';
+  static const String min30 = '30m';
+  static const String hour1 = '1h';
+  static const String hour2 = '2h';
+  static const String hour4 = '4h';
+  static const String hour6 = '6h';
+  static const String hour8 = '8h';
+  static const String hour12 = '12h';
+  static const String day1 = '1d';
+  static const String day3 = '3d';
+  static const String week = '1w';
+  static const String month = '1M';
 }

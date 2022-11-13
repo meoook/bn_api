@@ -1,7 +1,5 @@
 import 'bn_api.dart';
 import 'objects.dart';
-import 'objects/acc_objects.dart';
-import 'objects/orders_objects.dart';
 
 class BnSerializedApi {
   final BnApi _api;
@@ -28,6 +26,13 @@ class BnSerializedApi {
     return AccInfo(_data);
   }
 
+  Future<List> getKLines(String symbol, String interval, {int? limit, int? startTime, int? endTime}) async {
+    final List _data = await _api
+        .getKLines(symbol, interval, limit: limit, startTime: startTime, endTime: endTime)
+        .then((r) => r.json);
+    return List.from(_data.map((e) => CandleStick(e)));
+  }
+
   Future<List<MarginOrder>> getOpenMarginOrders({String? symbol, bool? isIsolated}) async {
     final List _data = await _api.getOpenMarginOrders(symbol: symbol, isIsolated: isIsolated).then((r) => r.json);
     return List<MarginOrder>.from(_data.map((e) => MarginOrder(e)));
@@ -41,7 +46,42 @@ class BnSerializedApi {
     return MarginOrder(_data);
   }
 
-  Future<MarginOrder> cancelMarginOrder(
+  Future<MarginCreatedOrder> createMarginOrder(
+    String symbol,
+    String side, // BUY,SELL
+    String orderType, {
+    bool? isIsolated,
+    String? timeInForce, // GTC,IOC,FOK
+    double? quantity,
+    double? quoteOrderQty,
+    double? price,
+    double? stopPrice, // Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
+    String? newClientOrderId, // A unique id among open orders. Automatically generated if not sent.
+    double? icebergQty, // Used with LIMIT, STOP_LOSS_LIMIT, and TAKE_PROFIT_LIMIT to create an iceberg order.
+    String? newOrderRespType, // Set the response JSON. ACK, RESULT, or FULL;
+    String? sideEffectType, // NO_SIDE_EFFECT, MARGIN_BUY, AUTO_REPAY; default NO_SIDE_EFFECT
+  }) async {
+    final Map _data = await _api
+        .createMarginOrder(
+          symbol,
+          side,
+          orderType,
+          isIsolated: isIsolated,
+          timeInForce: timeInForce,
+          quantity: quantity,
+          quoteOrderQty: quoteOrderQty,
+          price: price,
+          stopPrice: stopPrice,
+          newClientOrderId: newClientOrderId,
+          icebergQty: icebergQty,
+          newOrderRespType: newOrderRespType,
+          sideEffectType: sideEffectType,
+        )
+        .then((r) => r.json);
+    return MarginCreatedOrder(_data);
+  }
+
+  Future<MarginCancelOrder> cancelMarginOrder(
       {String? symbol, bool? isIsolated, int? orderId, String? origClientOrderId, String? newClientOrderId}) async {
     final Map _data = await _api
         .cancelMarginOrder(
@@ -51,7 +91,8 @@ class BnSerializedApi {
             origClientOrderId: origClientOrderId,
             newClientOrderId: newClientOrderId)
         .then((r) => r.json);
-    print('CANCEL RESULT $_data');
-    return MarginOrder(_data);
+    return MarginCancelOrder(_data);
   }
+
+  Future getAvgPrice(String symbol) async => _api.getAvgPrice(symbol).then((r) => AvgPrice(r.json));
 }

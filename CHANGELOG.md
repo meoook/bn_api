@@ -5,6 +5,8 @@
 |         |            | Comments                                             |
 |         |            | Not serialized data for compute                      |
 |         |            | Serialized client                                    |
+|  0.1.5  | 13.11.2022 | Objects: CandleStick and MarginOrder(Cancel, Create) |
+|  0.1.4  | 12.11.2022 | Error codes                                          |
 |  0.1.3  | 31.10.2022 | Objects: MarginOrder and AccInfo                     |
 |  0.1.2  | 30.10.2022 | Objects: Exchange Info and Permissions               |
 |  0.1.1  | 19.10.2022 | Objects: Products                                    |

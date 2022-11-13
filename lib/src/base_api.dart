@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
 
-import 'constants.dart';
 import 'objects.dart';
 
 class ApiResponse {
@@ -78,7 +77,7 @@ class BaseClient {
       final _tmpUri = Uri(queryParameters: _result.map((key, value) => MapEntry(key, '$value')));
       _result['signature'] = _generateSignature(_tmpUri.query);
     }
-    return _result;
+    return _result.map((key, value) => MapEntry(key, '$value'));
   }
 
   Future _doRequest(HttpMethod method, Uri uri, [Map<String, dynamic>? params]) async {
@@ -98,9 +97,7 @@ class BaseClient {
       [Map<String, dynamic>? params]) async {
     final Map<String, dynamic> _reqParams = _getRequestArguments(signed, params);
     print('Request ${method.name.toUpperCase()} $uriHost/$uriPath $_reqParams');
-    final Uri _uri = (method == HttpMethod.get)
-        ? Uri.https(uriHost, uriPath, _reqParams.map((key, value) => MapEntry(key, '$value')))
-        : Uri.https(uriHost, uriPath);
+    final Uri _uri = (method == HttpMethod.get) ? Uri.https(uriHost, uriPath, _reqParams) : Uri.https(uriHost, uriPath);
 
     http.Response response;
     try {
