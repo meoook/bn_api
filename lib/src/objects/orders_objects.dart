@@ -111,7 +111,7 @@ class MarginCreatedOrder {
   late double? marginBuyBorrowAmount; // will not return if no margin trade happens
   late String? marginBuyBorrowAsset; // will not return if no margin trade happens
 
-  final List<MarginOrderFill> fills = [];
+  final List<MarginOrderFill>? fills;
 
   MarginCreatedOrder(Map m)
       : symbol = m['symbol'],
@@ -126,10 +126,10 @@ class MarginCreatedOrder {
         timeInForce = m['timeInForce'],
         type = m['type'],
         isIsolated = m['isIsolated'],
-        side = m['side'] {
+        side = m['side'],
+        fills = (m.containsKey('fills')) ? m['fills'].map((e) => MarginOrderFill(e)) : null {
     if (m.containsKey('marginBuyBorrowAmount')) marginBuyBorrowAmount = double.parse(m['marginBuyBorrowAmount']);
     if (m.containsKey('marginBuyBorrowAsset')) marginBuyBorrowAsset = m['marginBuyBorrowAsset'];
-    if (m.containsKey('fills')) m['fills'].forEach((e) => fills.add(MarginOrderFill(e)));
   }
 
   @override

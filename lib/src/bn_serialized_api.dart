@@ -94,5 +94,54 @@ class BnSerializedApi {
     return MarginCancelOrder(_data);
   }
 
-  Future getAvgPrice(String symbol) async => _api.getAvgPrice(symbol).then((r) => AvgPrice(r.json));
+  Future<AvgPrice> getAvgPrice(String symbol) async => _api.getAvgPrice(symbol).then((r) => AvgPrice(r.json));
+
+  Future<MarginAsset> getMarginAsset(String asset) async => _api.getMarginAsset(asset).then((r) => MarginAsset(r.json));
+
+  Future<List<MarginTrade>> getMarginTrades(String symbol,
+      {bool? isIsolated, int? orderId, int? startTime, int? endTime, int? fromId, int? limit}) async {
+    final List _data = await _api
+        .getMarginTrades(symbol,
+            isIsolated: isIsolated,
+            orderId: orderId,
+            startTime: startTime,
+            endTime: endTime,
+            fromId: fromId,
+            limit: limit)
+        .then((r) => r.json);
+    return List<MarginTrade>.from(_data.map((e) => MarginTrade(e)));
+  }
+
+  Future<MarginLevelInfo> getMarginLevelInfo(String asset) async {
+    return await _api.getMarginLevelInfo(asset).then((r) => MarginLevelInfo(r.json));
+  }
+
+  Future<List<IsolatedTransfer>> getIsolatedTransferHistory(
+    String symbol, {
+    String? asset,
+    String? transFrom, // SPOT, ISOLATED_MARGIN
+    String? transTo, // SPOT, ISOLATED_MARGIN
+    int? startTime,
+    int? endTime,
+    int? current, // Current page, default 1
+    int? size, // Default 10, max 100
+    bool? archived, // Default: false. Set to true for archived data from 6 months ago
+  }) async {
+    final Map _data = await _api
+        .getIsolatedTransferHistory(symbol,
+            asset: asset,
+            transFrom: transFrom,
+            transTo: transTo,
+            startTime: startTime,
+            endTime: endTime,
+            current: current,
+            size: size,
+            archived: archived)
+        .then((r) => r.json);
+    return List<IsolatedTransfer>.from(_data['rows'].map((e) => IsolatedTransfer(e)));
+  }
+
+  Future<IsolatedMarginAccountInfo> getIsolatedMarginAccount([String? symbols]) async {
+    return await _api.getIsolatedMarginAccount(symbols).then((r) => IsolatedMarginAccountInfo(r.json));
+  }
 }

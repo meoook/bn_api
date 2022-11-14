@@ -20,10 +20,10 @@ class ApiResponse {
 class BaseClient {
   static const Duration requestTimeout = Duration(seconds: 10);
 
-  static const String symbolTypeSpot = 'SPOT';
+  static const String symbolTypeSpot = 'SPOT'; // TODO: rm
 
-  static const String sideBuy = 'BUY';
-  static const String sideSell = 'SELL';
+  static const String sideBuy = 'BUY'; // TODO: rm
+  static const String sideSell = 'SELL'; // TODO: rm
 
   final String? _apiKey;
   final String? _apiSecret;
