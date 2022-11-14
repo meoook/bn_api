@@ -31,8 +31,8 @@ class BaseClient {
   final Map<String, String>? _params;
   Duration timeOffset = Duration(); // in milliseconds
 
-  /// [requestParams]: optional - Dictionary of requests params to use for all calls
-  /// [testnet]: Use testnet environment - only available for vanilla options at the moment
+  /// Dictionary of [requestParams] to use for all calls.
+  /// Use [testnet] environment - only available for vanilla options at the moment.
   BaseClient({String? apiKey, String? apiSecret, this.testnet = false, Map<String, String>? requestParams})
       : _apiKey = apiKey,
         _apiSecret = apiSecret,

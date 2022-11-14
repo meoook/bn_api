@@ -564,9 +564,10 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'margin/isolated/pair', signed: true, params: _params);
   }
 
+  /// Get All Isolated Margin Symbol
+  /// https://binance-docs.github.io/apidocs/spot/en/#get-all-isolated-margin-symbol-user_data
   Future get_all_isolated_margin_symbols() async {
-    final Map<String, dynamic> _params = {};
-    return await requestMarginApi(HttpMethod.get, 'margin/isolated/allPairs', signed: true, params: _params);
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/allPairs', signed: true);
   }
 
   Future toggle_bnb_burn_spot_margin() async {
