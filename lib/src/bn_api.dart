@@ -566,7 +566,7 @@ class BnApi extends BaseClient {
 
   /// Get All Isolated Margin Symbol
   /// https://binance-docs.github.io/apidocs/spot/en/#get-all-isolated-margin-symbol-user_data
-  Future get_all_isolated_margin_symbols() async {
+  Future getAllIsolatedMarginSymbols() async {
     return await requestMarginApi(HttpMethod.get, 'margin/isolated/allPairs', signed: true);
   }
 

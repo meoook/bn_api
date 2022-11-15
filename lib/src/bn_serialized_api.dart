@@ -144,4 +144,8 @@ class BnSerializedApi {
   Future<IsolatedMarginAccountInfo> getIsolatedMarginAccount([String? symbols]) async {
     return await _api.getIsolatedMarginAccount(symbols).then((r) => IsolatedMarginAccountInfo(r.json));
   }
+
+  Future<List<IsolatedMarginSymbol>> getAllIsolatedMarginSymbols() async {
+    return await _api.getAllIsolatedMarginSymbols().then((r) => List.from(r.json.map((e) => IsolatedMarginSymbol(e))));
+  }
 }

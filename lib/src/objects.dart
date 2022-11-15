@@ -118,7 +118,6 @@ class CandleStick {
 }
 
 class AvgPrice {
-  /// AvgPrice
   final int mins;
   final double price;
 
@@ -133,7 +132,6 @@ class AvgPrice {
 }
 
 class MarginAsset {
-  /// MarginAsset
   final String assetName;
   final String assetFullName;
   final bool isBorrowable;
@@ -156,7 +154,6 @@ class MarginAsset {
 }
 
 class MarginTrade {
-  /// MarginTrade
   final double commission;
   final String commissionAsset;
   final int id;
@@ -191,7 +188,6 @@ class MarginTrade {
 }
 
 class IsolatedTransfer {
-  /// IsolatedTransfer
   final double amount;
   final String asset;
   final String status;
@@ -218,7 +214,6 @@ class IsolatedTransfer {
 }
 
 class MarginLevelInfo {
-  /// MarginLevelInfo
   final double normalBar;
   final double marginCallBar;
   final double forceLiquidationBar;
@@ -317,4 +312,26 @@ class IsolatedMarginAccountInfo {
   }
 
   IsolatedMarginAsset getAssetInfo(String symbol) => assets.firstWhere((e) => e.symbol == symbol.toUpperCase());
+}
+
+class IsolatedMarginSymbol {
+  final String base;
+  final bool isBuyAllowed;
+  final bool isMarginTrade;
+  final bool isSellAllowed;
+  final String quote;
+  final String symbol;
+
+  IsolatedMarginSymbol(Map m)
+      : base = m['base'],
+        isBuyAllowed = m['isBuyAllowed'],
+        isMarginTrade = m['isMarginTrade'],
+        isSellAllowed = m['isSellAllowed'],
+        quote = m['quote'],
+        symbol = m['symbol'];
+
+  @override
+  String toString() {
+    return '$base:$quote';
+  }
 }
