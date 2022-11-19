@@ -26,4 +26,3 @@
 |  0.0.3  | 16.10.2022 | User Stream Endpoints                                  |
 |  0.0.2  | 16.10.2022 | Order API                                              |
 |  0.0.1  | 15.10.2022 | BaseClient                                             |
-
