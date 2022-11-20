@@ -149,9 +149,9 @@ class BnSerializedApi {
     return await _api.getAllIsolatedMarginSymbols().then((r) => List.from(r.json.map((e) => IsolatedMarginSymbol(e))));
   }
 
-  Future<List<IsolatedMarginFee>> getIsolatedMarginFee({String? symbols, int? vipLevel}) async {
+  Future<List<IsolatedMarginFee>> getIsolatedMarginFee({String? symbol, int? vipLevel}) async {
     return await _api
-        .getIsolatedMarginFee(symbols: symbols, vipLevel: vipLevel)
+        .getIsolatedMarginFee(symbol: symbol, vipLevel: vipLevel)
         .then((r) => List.from(r.json.map((e) => IsolatedMarginFee(e))));
   }
 }
