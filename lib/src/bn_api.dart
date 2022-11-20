@@ -533,6 +533,16 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.delete, 'margin/isolated/account', signed: true, params: _params);
   }
 
+  /// Get isolated margin fee data collection with any vip level or user's current specific data
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-isolated-margin-fee-data-user_data
+  Future getIsolatedMarginFee({String? symbols, int? vipLevel}) async {
+    final Map<String, dynamic> _params = {
+      if (symbols != null) 'symbols': symbols,
+      if (vipLevel != null) 'vipLevel': vipLevel,
+    };
+    return await requestMarginApi(HttpMethod.get, 'margin/isolatedMarginData', signed: true, params: _params);
+  }
+
   /// Query Margin Asset
   /// https://binance-docs.github.io/apidocs/spot/en/#query-margin-asset-market_data
   Future getMarginAsset(String asset) async {

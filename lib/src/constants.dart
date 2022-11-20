@@ -86,4 +86,20 @@ class BnApiTimeFrame {
   static const String day3 = '3d';
   static const String week = '1w';
   static const String month = '1M';
+  static const List<String> choices = [
+    '1m',
+    '3m',
+    '5m',
+    '15m',
+    '1h',
+    '2h',
+    '4h',
+    '6h',
+    '8h',
+    '12h',
+    '1d',
+    '3d',
+    '1w',
+    '1M'
+  ];
 }

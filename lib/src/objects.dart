@@ -3,6 +3,7 @@ export 'constants.dart';
 export 'objects/exchange_info.dart';
 export 'objects/acc_objects.dart';
 export 'objects/orders_objects.dart';
+export 'objects/ws_objects.dart';
 
 // enum KLinesType { spot, futures, futuresCoin }
 
@@ -333,5 +334,23 @@ class IsolatedMarginSymbol {
   @override
   String toString() {
     return '$base:$quote';
+  }
+}
+
+class IsolatedMarginFee {
+  final String symbol;
+  final int vipLevel;
+  final int leverage;
+  final List allData;
+
+  IsolatedMarginFee(Map m)
+      : symbol = m['symbol'],
+        vipLevel = m['vipLevel'],
+        leverage = int.parse(m['leverage']),
+        allData = m['data'];
+
+  @override
+  String toString() {
+    return '$symbol leverage: $leverage';
   }
 }
