@@ -1,6 +1,11 @@
 # binance api
 
-Binance Api on Dart language. Max copied from python library. 
+**_Binance Api on Dart language. Max copied from python library._**
+
+* web site: [github.com][git]
+* version: 0.0.1
+* author: [meok][author]
+* build: http, websocket
 
 ## Example
 
@@ -14,10 +19,15 @@ main() async {
 }
 ```
 
+## Functions
+
+- [ ] Serilize
+- [ ] Websocket
+
 ## Release notes
 
 [Release notes][log]
 
-[prod]: <https://404.com> "MS system"
+[git]: <https://github.com/meoook/bn_api> "Git repository"
 [log]: <CHANGELOG.md> "Release notes"
 [author]: <https://bazha.ru> "meok home page"
