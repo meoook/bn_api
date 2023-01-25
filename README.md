@@ -3,7 +3,7 @@
 **_Binance Api on Dart language. Max copied from python library._**
 
 * web site: [github.com][git]
-* version: 0.1.8
+* version: 0.1.9
 * author: [meok][author]
 * build: http, websocket
 
