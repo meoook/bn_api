@@ -27,15 +27,18 @@ class BaseClient {
 
   final String? _apiKey;
   final String? _apiSecret;
-  final bool testnet;
+  final bool _testnet;
+  final bool _debug;
   final Map<String, String>? _params;
   Duration timeOffset = Duration(); // in milliseconds
 
   /// Dictionary of [requestParams] to use for all calls.
   /// Use [testnet] environment - only available for vanilla options at the moment.
-  BaseClient({String? apiKey, String? apiSecret, this.testnet = false, Map<String, String>? requestParams})
+  BaseClient({String? apiKey, String? apiSecret, testnet = false, debug = false, Map<String, String>? requestParams})
       : _apiKey = apiKey,
         _apiSecret = apiSecret,
+        _testnet = testnet,
+        _debug = debug,
         _params = requestParams;
 
   Map<String, String> get _headers {
@@ -96,7 +99,7 @@ class BaseClient {
   Future<ApiResponse> _request(HttpMethod method, String uriHost, String uriPath, bool signed,
       [Map<String, dynamic>? params]) async {
     final Map<String, dynamic> _reqParams = _getRequestArguments(signed, params);
-    print('Request ${method.name.toUpperCase()} $uriHost/$uriPath $_reqParams');
+    if (_debug) print('Request ${method.name.toUpperCase()} $uriHost/$uriPath $_reqParams');
     final Uri _uri = (method == HttpMethod.get) ? Uri.https(uriHost, uriPath, _reqParams) : Uri.https(uriHost, uriPath);
 
     http.Response response;
@@ -111,39 +114,39 @@ class BaseClient {
 
   Future<ApiResponse> requestApi(HttpMethod method, String uriPath,
       {bool signed = false, String? version, Map<String, dynamic>? params}) async {
-    final String _uriHost = testnet ? BnApiUrls.apiUrlTestnet : BnApiUrls.apiUrl;
+    final String _uriHost = _testnet ? BnApiUrls.apiUrlTestnet : BnApiUrls.apiUrl;
     final String _version = signed ? BnApiUrls.privateApiVersion : version ?? BnApiUrls.publicApiVersion;
     return await _request(method, _uriHost, 'api/$_version/$uriPath', signed, params);
   }
 
   Future<ApiResponse> requestFuturesApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
-    final String _uriHost = testnet ? BnApiUrls.futuresUrlTestnet : BnApiUrls.futuresUrl;
+    final String _uriHost = _testnet ? BnApiUrls.futuresUrlTestnet : BnApiUrls.futuresUrl;
     return await _request(method, _uriHost, 'fapi/${BnApiUrls.futuresApiVersion}/$uriPath', signed, params);
   }
 
   Future<ApiResponse> requestFuturesDataApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
-    final String _uriHost = testnet ? BnApiUrls.futuresUrlTestnet : BnApiUrls.futuresUrl;
+    final String _uriHost = _testnet ? BnApiUrls.futuresUrlTestnet : BnApiUrls.futuresUrl;
     return await _request(method, _uriHost, 'futures/data/$uriPath', signed, params);
   }
 
   Future<ApiResponse> requestFuturesCoinApi(HttpMethod method, String uriPath,
       {bool signed = false, int version = 1, Map<String, dynamic>? params}) async {
-    final String _uriHost = testnet ? BnApiUrls.futuresCoinUrlTestnet : BnApiUrls.futuresCoinUrl;
+    final String _uriHost = _testnet ? BnApiUrls.futuresCoinUrlTestnet : BnApiUrls.futuresCoinUrl;
     final String _version = version == 1 ? BnApiUrls.futuresApiVersion : BnApiUrls.futuresApiVersion2;
     return await _request(method, _uriHost, 'dapi/$_version/$uriPath', signed, params);
   }
 
   Future<ApiResponse> requestFuturesCoinDataApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
-    final String _uriHost = testnet ? BnApiUrls.futuresCoinUrlTestnet : BnApiUrls.futuresCoinUrl;
+    final String _uriHost = _testnet ? BnApiUrls.futuresCoinUrlTestnet : BnApiUrls.futuresCoinUrl;
     return await _request(method, _uriHost, 'futures/data/$uriPath', signed, params);
   }
 
   Future<ApiResponse> requestOptionsApi(HttpMethod method, String uriPath,
       {bool signed = false, Map<String, dynamic>? params}) async {
-    final String _uriHost = testnet ? BnApiUrls.optionsUrlTestnet : BnApiUrls.optionsUrl;
+    final String _uriHost = _testnet ? BnApiUrls.optionsUrlTestnet : BnApiUrls.optionsUrl;
     return await _request(method, _uriHost, 'vapi/${BnApiUrls.optionsApiVersion}/$uriPath', signed, params);
   }
 

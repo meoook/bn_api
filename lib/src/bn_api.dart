@@ -2,8 +2,9 @@ import 'base_api.dart';
 import 'objects.dart';
 
 class BnApi extends BaseClient {
-  BnApi({String? apiKey, String? apiSecret, bool testnet = false, Map<String, String>? requestParams})
-      : super(apiKey: apiKey, apiSecret: apiSecret, testnet: testnet, requestParams: requestParams) {
+  BnApi(
+      {String? apiKey, String? apiSecret, bool testnet = false, bool debug = false, Map<String, String>? requestParams})
+      : super(apiKey: apiKey, apiSecret: apiSecret, testnet: testnet, debug: debug, requestParams: requestParams) {
     _init();
   }
 
