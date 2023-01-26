@@ -6,8 +6,9 @@ import 'package:crypto/crypto.dart';
 import 'objects.dart';
 
 class ApiResponse {
+  /// Response without immediately decode - for flutter compute
   final String data;
-  dynamic _json;
+  dynamic _json = null;
 
   ApiResponse(this.data);
 
@@ -18,12 +19,7 @@ class ApiResponse {
 }
 
 class BaseClient {
-  static const Duration requestTimeout = Duration(seconds: 10);
-
-  static const String symbolTypeSpot = 'SPOT'; // TODO: rm
-
-  static const String sideBuy = 'BUY'; // TODO: rm
-  static const String sideSell = 'SELL'; // TODO: rm
+  static const Duration _requestTimeout = Duration(seconds: 10);
 
   final String? _apiKey;
   final String? _apiSecret;
@@ -43,11 +39,7 @@ class BaseClient {
 
   Map<String, String> get _headers {
     Map<String, String> headers = {
-      // HttpHeaders.contentTypeHeader: ContentType.json.toString(),
       HttpHeaders.acceptHeader: 'application/json',
-      // 'Accept': 'application/json',
-      // "HTTP_ACCEPT_LANGUAGE": "en-US",
-      // HttpHeaders.acceptLanguageHeader: 'en-US',  // "Accept-Language": "en-US",
       'User-Agent':
           'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
     };
@@ -58,7 +50,7 @@ class BaseClient {
   }
 
   String _generateSignature(String queryString) {
-    assert(_apiSecret!.isNotEmpty, 'API Secret required for private endpoints');
+    if (_apiSecret == null || _apiSecret!.isEmpty) throw RuntimeException('API Secret required for private endpoints');
     List<int> messageBytes = utf8.encode(queryString);
     List<int> key = utf8.encode(_apiSecret as String);
     Hmac hMac = Hmac(sha256, key);
@@ -86,13 +78,13 @@ class BaseClient {
   Future _doRequest(HttpMethod method, Uri uri, [Map<String, dynamic>? params]) async {
     switch (method) {
       case HttpMethod.get:
-        return await http.get(uri, headers: _headers).timeout(requestTimeout);
+        return await http.get(uri, headers: _headers).timeout(_requestTimeout);
       case HttpMethod.post:
-        return await http.post(uri, headers: _headers, body: params).timeout(requestTimeout);
+        return await http.post(uri, headers: _headers, body: params).timeout(_requestTimeout);
       case HttpMethod.put:
-        return await http.put(uri, headers: _headers, body: params).timeout(requestTimeout);
+        return await http.put(uri, headers: _headers, body: params).timeout(_requestTimeout);
       case HttpMethod.delete:
-        return await http.delete(uri, headers: _headers, body: params).timeout(requestTimeout);
+        return await http.delete(uri, headers: _headers, body: params).timeout(_requestTimeout);
     }
   }
 
@@ -106,9 +98,9 @@ class BaseClient {
     try {
       response = await _doRequest(method, _uri, _reqParams);
     } on SocketException catch (_err) {
-      throw BinanceApiException("{'code': 500, 'message': 'Socket error - $_err'}");
+      throw BnApiException("{'code': 500, 'message': 'Socket error - $_err'}");
     }
-    if (response.statusCode >= 300) throw BinanceApiException(response.body);
+    if (response.statusCode >= 300) throw BnApiException(response.body);
     return ApiResponse(response.body);
   }
 

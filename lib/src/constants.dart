@@ -28,6 +28,12 @@ class BnApiOrderSide {
   static const String sell = 'SELL';
 }
 
+class BnApiTradeType {
+  static const String spot = 'SPOT';
+  static const String margin = 'MARGIN';
+  static const String futures = 'FUTURES';
+}
+
 class BnApiOrderType {
   static const String limit = 'LIMIT';
   static const String market = 'MARKET';
@@ -46,7 +52,7 @@ class BnApiOrderType {
   static const String futureLimitMaker = 'LIMIT_MAKER';
 }
 
-class BnAggKeys {
+class BnApiAggKeys {
   // For accessing the data returned by Client.aggregate_trades().
   static const String aggID = 'a';
   static const String aggPrice = 'p';
@@ -58,7 +64,7 @@ class BnAggKeys {
   static const String aggBestMatch = 'M';
 }
 
-class BnTimeInForce {
+class BnApiTimeInForce {
   static const String gtc = 'GTC'; // Good till cancelled
   static const String ioc = 'IOC'; // Immediate or cancel
   static const String fok = 'FOK'; // Fill or kill
@@ -68,6 +74,16 @@ class BnApiOrderSideEffect {
   static const String no_side = 'NO_SIDE_EFFECT'; // For normal trade order
   static const String margin = 'MARGIN_BUY'; // For margin trade order
   static const String auto = 'AUTO_REPAY'; // For making auto repayment after order filled
+}
+
+class BnApiSymbolStatus {
+  static const String preTrading = 'PRE_TRADING';
+  static const String trading = 'TRADING';
+  static const String postTrading = 'POST_TRADING';
+  static const String endOfDay = 'END_OF_DAY';
+  static const String halt = 'HALT';
+  static const String auctionMatch = 'AUCTION_MATCH';
+  static const String breakTrading = 'BREAK';
 }
 
 class BnApiTimeFrame {

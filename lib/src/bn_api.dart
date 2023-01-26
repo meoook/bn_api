@@ -16,14 +16,47 @@ class BnApi extends BaseClient {
       final DateTime now = DateTime.now();
       timeOffset = Duration(milliseconds: srvTime - now.millisecondsSinceEpoch);
     } catch (err) {
-      throw Exception('failed to init API $err'); // TODO: other type of exception
+      throw RuntimeException('failed to init API $err');
     }
   }
 
+  // =================================================================================================================
   // General Endpoints
+  // =================================================================================================================
+
   Future<bool> ping() => get('ping', version: BnApiUrls.privateApiVersion).then((r) => true);
 
   Future<int> getServerTime() => get('time', version: BnApiUrls.privateApiVersion).then((r) => r.json['serverTime']);
+
+  // =================================================================================================================
+  // Wallet Endpoints
+  // =================================================================================================================
+
+  /// https://binance-docs.github.io/apidocs/spot/en/#system-status-system
+  Future getSystemStatus() async {
+    return await requestMarginApi(HttpMethod.get, 'system/status');
+  }
+
+  /// https://binance-docs.github.io/apidocs/spot/en/#all-coins-39-information-user_data
+  Future getAllCoinsInfo() async {
+    return await requestMarginApi(HttpMethod.get, 'capital/config/getall', signed: true);
+  }
+
+  /// Daily Account Snapshot
+  /// https://binance-docs.github.io/apidocs/spot/en/#daily-account-snapshot-user_data
+  /// The [limit] time period must be less then 30 days
+  /// If [startTime] and [endTime] not sent, return records of the last 7 days by default
+  Future getAccountSnapshot(String type, {int? limit, int? startTime, int? endTime}) async {
+    final Map<String, dynamic> params = {
+      'type': type, // BnApiTradeType: SPOT, MARGIN, FUTURES
+      if (limit != null) 'limit': limit, // Default 7, min 7, max 30
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+    };
+    return await requestMarginApi(HttpMethod.get, 'accountSnapshot', signed: true, params: params);
+  }
+
+  // =================================================================================================================
 
   // Exchange Endpoints
   Future<ApiResponse> getProducts() => requestWebsite(HttpMethod.get, BnApiUrls.exchangeProducts).then((r) => r);
@@ -85,7 +118,7 @@ class BnApi extends BaseClient {
       for (var i = 0; i < trades.length; i++) {
         yield trades[i];
       }
-      lastID = trades[-1][BnAggKeys.aggID];
+      lastID = trades[-1][BnApiAggKeys.aggID];
 
       while (true) {
         // There is no need to wait between queries, to avoid hitting the
@@ -101,7 +134,7 @@ class BnApi extends BaseClient {
         for (var i = 0; i < trades.length; i++) {
           yield trades[i];
         }
-        lastID = trades[-1][BnAggKeys.aggID];
+        lastID = trades[-1][BnApiAggKeys.aggID];
       }
     }
   }
@@ -120,7 +153,7 @@ class BnApi extends BaseClient {
     return await get('klines', version: BnApiUrls.privateApiVersion, params: params);
   }
 
-  /// Current average price for a symbol.
+  /// Current average price for a symbol (5min).
   /// https://binance-docs.github.io/apidocs/spot/en/#current-average-price
   Future getAvgPrice(String symbol) =>
       get('avgPrice', version: BnApiUrls.privateApiVersion, params: {'symbol': symbol});
@@ -197,29 +230,29 @@ class BnApi extends BaseClient {
       BnApiOrderType.limit,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.gtc,
+      timeInForce: timeInForce ?? BnApiTimeInForce.gtc,
     );
   }
 
   Future order_limit_buy(String symbol, double price, double quantity, {String? timeInForce}) async {
     return await createOrder(
       symbol,
-      BaseClient.sideBuy,
+      BnApiOrderSide.buy,
       BnApiOrderType.limit,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.gtc,
+      timeInForce: timeInForce ?? BnApiTimeInForce.gtc,
     );
   }
 
   Future order_limit_sell(String symbol, double price, double quantity, {String? timeInForce}) async {
     return await createOrder(
       symbol,
-      BaseClient.sideSell,
+      BnApiOrderSide.sell,
       BnApiOrderType.limit,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.gtc,
+      timeInForce: timeInForce ?? BnApiTimeInForce.gtc,
     );
   }
 
@@ -230,29 +263,29 @@ class BnApi extends BaseClient {
       BnApiOrderType.market,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.gtc,
+      timeInForce: timeInForce ?? BnApiTimeInForce.gtc,
     );
   }
 
   Future order_market_buy(String symbol, double price, double quantity, {String? timeInForce}) async {
     return await createOrder(
       symbol,
-      BaseClient.sideBuy,
+      BnApiOrderSide.buy,
       BnApiOrderType.market,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.gtc,
+      timeInForce: timeInForce ?? BnApiTimeInForce.gtc,
     );
   }
 
   Future order_market_sell(String symbol, double price, double quantity, {String? timeInForce}) async {
     return await createOrder(
       symbol,
-      BaseClient.sideSell,
+      BnApiOrderSide.sell,
       BnApiOrderType.market,
       price: price,
       quantity: quantity,
-      timeInForce: timeInForce ?? BnTimeInForce.gtc,
+      timeInForce: timeInForce ?? BnApiTimeInForce.gtc,
     );
   }
 
@@ -409,10 +442,6 @@ class BnApi extends BaseClient {
     return await get('myTrades', signed: true);
   }
 
-  Future get_system_status() async {
-    return await requestMarginApi(HttpMethod.get, 'system/status');
-  }
-
   Future get_account_status() async {
     return await requestMarginApi(HttpMethod.get, 'account/status', signed: true);
   }
@@ -508,7 +537,9 @@ class BnApi extends BaseClient {
     return await delete('userDataStream', signed: false, params: {'listenKey': listenKey});
   }
 
+  // =================================================================================================================
   // Margin Trading Endpoints
+  // =================================================================================================================
 
   Future get_margin_account() async {
     return await requestMarginApi(HttpMethod.get, 'margin/account', signed: true);
@@ -1494,16 +1525,6 @@ class BnApi extends BaseClient {
   Future futures_coin_stream_close(String listenKey) async {
     final Map<String, dynamic> _params = {'listenKey': listenKey};
     return await requestFuturesCoinApi(HttpMethod.delete, 'listenKey', signed: false, params: _params);
-  }
-
-  Future get_all_coins_info() async {
-    final Map<String, dynamic> _params = {};
-    return await requestFuturesCoinApi(HttpMethod.get, 'capital/config/getall', signed: true, params: _params);
-  }
-
-  Future get_account_snapshot() async {
-    final Map<String, dynamic> _params = {};
-    return await requestFuturesCoinApi(HttpMethod.get, 'accountSnapshot', signed: true, params: _params);
   }
 
   Future disable_fast_withdraw_switch() async {

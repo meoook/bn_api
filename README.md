@@ -1,13 +1,13 @@
 # binance api
 
-**_Binance Api on Dart language. Max copied from python library._**
+**_Binance Api on Dart language._**
 
 * web site: [github.com][git]
-* version: 0.1.9
+* version: 0.1.10
 * author: [meok][author]
 * build: http, websocket
 
-Actual for binance API version 2022-11-22 [binance-api][binance]
+Actual for binance API version 2023-01-19 [binance-api][binance]
 
 ## Example
 
@@ -22,9 +22,36 @@ main() async {
 }
 ```
 
-## Functions
+## Endpoints
 
-- [ ] Serilize
+- [ ] Wallet
+- [ ] Sub-Account
+- [ ] Market Data
+- [ ] Websocket ?
+- [ ] Spot Account/Trade
+- [ ] Margin Account/Trade
+- [ ] User Data Streams
+- [ ] Savings
+- [ ] Stacking
+- [ ] Mining
+- [ ] Futures
+- [ ] Futures Algo
+- [ ] Portfolio Margin
+- [ ] BLVT
+- [ ] BSwap
+- [ ] Fiat
+- [ ] C2C
+- [ ] VIP Loans
+- [ ] Crypto Loans
+- [ ] Pay
+- [ ] Convert
+- [ ] Rebate
+- [ ] NFT
+- [ ] Gift Card
+
+## Functionality
+
+- [ ] Serialized API
 - [ ] Websocket
 
 ## Release notes

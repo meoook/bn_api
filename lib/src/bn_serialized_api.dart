@@ -4,7 +4,32 @@ import 'objects.dart';
 class BnSerializedApi {
   final BnApi _api;
 
-  BnSerializedApi({String? apiKey, String? apiSecret}) : _api = BnApi(apiKey: apiKey, apiSecret: apiSecret);
+  BnSerializedApi({String? apiKey, String? apiSecret, bool debug = false})
+      : _api = BnApi(apiKey: apiKey, apiSecret: apiSecret, debug: debug);
+
+  // =================================================================================================================
+  // Wallet Endpoints
+  // =================================================================================================================
+  Future<BnApiSystemStatus> getSystemStatus() async {
+    final Map _data = await _api.getSystemStatus().then((r) => r.json);
+    return BnApiSystemStatus(_data);
+  }
+
+  Future<List<BnApiCoinInfo>> getAllCoinsInfo() async {
+    final List _data = await _api.getAllCoinsInfo().then((r) => r.json);
+    return List<BnApiCoinInfo>.from(_data.map((e) => BnApiCoinInfo(e)));
+  }
+
+  Future<List<dynamic>> getAccountSnapshot(String type, {int? limit, int? startTime, int? endTime}) async {
+    final Map _data =
+        await _api.getAccountSnapshot(type, limit: limit, startTime: startTime, endTime: endTime).then((r) => r.json);
+    return List.from(_data['snapshotVos'].map((e) {
+      if (e['type'].toUpperCase() == BnApiTradeType.spot) return BnApiAccountSnapshotSpot(e);
+      if (e['type'].toUpperCase() == BnApiTradeType.margin) return BnApiAccountSnapshotMargin(e);
+      if (e['type'].toUpperCase() == BnApiTradeType.futures) return BnApiAccountSnapshotFutures(e);
+    }));
+  }
+  // =================================================================================================================
 
   Future<List<SymbolProduct>> productList() async {
     final List _data = await _api.getProducts().then((r) => r.json['data']);
@@ -116,7 +141,7 @@ class BnSerializedApi {
     return await _api.getMarginLevelInfo(asset).then((r) => MarginLevelInfo(r.json));
   }
 
-  Future<List<IsolatedTransfer>> getIsolatedTransferHistory(
+  Future<List<IsolatedMarginTransfer>> getIsolatedTransferHistory(
     String symbol, {
     String? asset,
     String? transFrom, // SPOT, ISOLATED_MARGIN
@@ -138,7 +163,7 @@ class BnSerializedApi {
             size: size,
             archived: archived)
         .then((r) => r.json);
-    return List<IsolatedTransfer>.from(_data['rows'].map((e) => IsolatedTransfer(e)));
+    return List<IsolatedMarginTransfer>.from(_data['rows'].map((e) => IsolatedMarginTransfer(e)));
   }
 
   Future<IsolatedMarginAccountInfo> getIsolatedMarginAccount([String? symbols]) async {
