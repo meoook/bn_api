@@ -7,9 +7,7 @@ class BnSerializedApi {
   BnSerializedApi({String? apiKey, String? apiSecret, bool debug = false})
       : _api = BnApi(apiKey: apiKey, apiSecret: apiSecret, debug: debug);
 
-  // =================================================================================================================
-  // General Endpoints
-  // =================================================================================================================
+  // ========= General Endpoints ===============
   Future<BnApiSystemStatus> serverGetStatus() async {
     final Map _data = await _api.serverGetStatus().then((r) => r.json);
     return BnApiSystemStatus(_data);
@@ -20,6 +18,7 @@ class BnSerializedApi {
     return List<BnApiCoinInfo>.from(_data.map((e) => BnApiCoinInfo(e)));
   }
 
+  // ========= Account Endpoints ===============
   Future<List<dynamic>> accountGetSnapshot({required String type, int? limit, int? startTime, int? endTime}) async {
     final Map _data = await _api
         .accountGetSnapshot(type: type, limit: limit, startTime: startTime, endTime: endTime)

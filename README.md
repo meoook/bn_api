@@ -5,9 +5,9 @@
 * web site: [github.com][git]
 * version: 0.1.11
 * author: [meok][author]
-* build: http, websocket
+* dependencies: http, web_socket_channel, test
 
-Actual for binance API version 2023-01-19 [binance-api][binance]
+Actual for [binance API][binance] version 2023-01-19 
 
 ## Example
 

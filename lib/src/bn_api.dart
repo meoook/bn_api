@@ -159,6 +159,7 @@ class BnApi extends BaseClient {
   }
 
   // =================================================================================================================
+  // =================================================================================================================
 
   // Exchange Endpoints
   Future<ApiResponse> getProducts() => requestWebsite(HttpMethod.get, BnApiUrls.exchangeProducts).then((r) => r);
@@ -586,29 +587,6 @@ class BnApi extends BaseClient {
 
   Future get_asset_details() async {
     return await requestMarginApi(HttpMethod.get, 'asset/assetDetail', signed: true);
-  }
-
-  Future get_withdraw_history() async {
-    return await requestMarginApi(HttpMethod.get, 'capital/withdraw/history', signed: true);
-  }
-
-  Future get_withdraw_history_id(int withdrawID) async {
-    final _history = await get_withdraw_history();
-
-    final _historyIterator = _history.iterator;
-    while (_historyIterator.moveNext()) {
-      final Map<String, dynamic> _entry = _historyIterator.current;
-      if (_entry.containsKey('id') && _entry['id'] == withdrawID) return _entry;
-    }
-    throw Exception('there is no entry with withdraw id $withdrawID');
-  }
-
-  Future get_deposit_address(String coin, {String? network}) async {
-    final Map<String, dynamic> _params = {
-      'coin': coin,
-      if (network != null) 'network': network,
-    };
-    return await requestMarginApi(HttpMethod.get, 'capital/deposit/address', signed: true, params: _params);
   }
 
   // User Stream Endpoints
