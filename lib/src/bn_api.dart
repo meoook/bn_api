@@ -12,7 +12,7 @@ class BnApi extends BaseClient {
     try {
       await ping();
       // calculate timestamp offset between local and binance server
-      final srvTime = await getServerTime();
+      final srvTime = await serverGetTime();
       final DateTime now = DateTime.now();
       timeOffset = Duration(milliseconds: srvTime - now.millisecondsSinceEpoch);
     } catch (err) {
@@ -26,27 +26,28 @@ class BnApi extends BaseClient {
 
   Future<bool> ping() => get('ping', version: BnApiUrls.privateApiVersion).then((r) => true);
 
-  Future<int> getServerTime() => get('time', version: BnApiUrls.privateApiVersion).then((r) => r.json['serverTime']);
-
-  // =================================================================================================================
-  // Wallet Endpoints
-  // =================================================================================================================
+  Future<int> serverGetTime() => get('time', version: BnApiUrls.privateApiVersion).then((r) => r.json['serverTime']);
 
   /// https://binance-docs.github.io/apidocs/spot/en/#system-status-system
-  Future getSystemStatus() async {
+  Future<ApiResponse> serverGetStatus() async {
     return await requestMarginApi(HttpMethod.get, 'system/status');
   }
 
+  /// All Coins Information
   /// https://binance-docs.github.io/apidocs/spot/en/#all-coins-39-information-user_data
-  Future getAllCoinsInfo() async {
+  Future<ApiResponse> coinsGetInfo() async {
     return await requestMarginApi(HttpMethod.get, 'capital/config/getall', signed: true);
   }
+
+  // =================================================================================================================
+  // Account Endpoints
+  // =================================================================================================================
 
   /// Daily Account Snapshot
   /// https://binance-docs.github.io/apidocs/spot/en/#daily-account-snapshot-user_data
   /// The [limit] time period must be less then 30 days
   /// If [startTime] and [endTime] not sent, return records of the last 7 days by default
-  Future getAccountSnapshot(String type, {int? limit, int? startTime, int? endTime}) async {
+  Future<ApiResponse> accountGetSnapshot({required String type, int? limit, int? startTime, int? endTime}) async {
     final Map<String, dynamic> params = {
       'type': type, // BnApiTradeType: SPOT, MARGIN, FUTURES
       if (limit != null) 'limit': limit, // Default 7, min 7, max 30
@@ -54,6 +55,107 @@ class BnApi extends BaseClient {
       if (endTime != null) 'endTime': endTime,
     };
     return await requestMarginApi(HttpMethod.get, 'accountSnapshot', signed: true, params: params);
+  }
+
+  /// Enable Fast Withdraw Switch
+  /// https://binance-docs.github.io/apidocs/spot/en/#enable-fast-withdraw-switch-user_data
+  /// You need to enable "trade" option for the api key which requests this endpoint.
+  Future<bool> accountEnableFastWithdraw() async {
+    return await requestMarginApi(HttpMethod.get, 'account/enableFastWithdrawSwitch', signed: true).then((r) => true);
+  }
+
+  /// Disable Fast Withdraw Switch
+  /// https://binance-docs.github.io/apidocs/spot/en/#disable-fast-withdraw-switch-user_data
+  /// You need to enable "trade" option for the api key which requests this endpoint.
+  Future<bool> accountDisableFastWithdraw() async {
+    return await requestMarginApi(HttpMethod.get, 'account/disableFastWithdrawSwitch', signed: true).then((r) => true);
+  }
+
+  /// Submit a withdraw request
+  /// https://binance-docs.github.io/apidocs/spot/en/#withdraw-user_data
+  /// If [network] not send, return with default network of the coin
+  /// You can get [network] and isDefault in networkList of a coin in the response of [coinsGetInfo]
+  Future<String> accountWithdraw({
+    required String coin,
+    required String address,
+    required double amount,
+    String? withdrawOrderId, // client id for withdraw
+    String? network,
+    String? addressTag, // Secondary address identifier for coins like XRP,XMR etc
+    bool? transactionFeeFlag, // Internal transfer, true/false for returning fee to destination/departure account
+    String? name, // Description of the address. Space in name should be encoded into %20
+    int? walletType, // Wallet type for withdraw，0-spot wallet ，1-funding wallet
+  }) async {
+    final params = {
+      'coin': coin,
+      'address': address,
+      'amount': amount,
+      if (withdrawOrderId != null) 'withdrawOrderId': withdrawOrderId,
+      if (network != null) 'network': network,
+      if (addressTag != null) 'addressTag': addressTag,
+      if (transactionFeeFlag != null) 'transactionFeeFlag': transactionFeeFlag,
+      if (name != null) 'name': name,
+      if (walletType != null) 'walletType': walletType,
+    };
+    return await requestMarginApi(HttpMethod.post, 'capital/withdraw/apply', signed: true, params: params)
+        .then((r) => r.json['id']); // 7213fea8e94b4a5593d507237e5a555b
+  }
+
+  /// Fetch deposit history (supporting network)
+  /// https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
+  /// If both [startTime] and [endTime] are sent, time between [startTime] and [endTime] must be less than 90 days
+  Future<ApiResponse> accountGetDepositHistory({
+    String? coin,
+    int? status, // 0:pending, 6:credited but cannot withdraw, 1:success
+    int? startTime, // Default: 90 days from current timestamp
+    int? endTime, // Default: present timestamp
+    int? offset, // Default: 0
+    int? limit, // Default: 1000, Max: 1000
+  }) async {
+    final params = {
+      if (coin != null) 'coin': coin,
+      if (status != null) 'status': status,
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+      if (offset != null) 'offset': offset,
+      if (limit != null) 'limit': limit,
+    };
+    return await requestMarginApi(HttpMethod.get, 'capital/deposit/hisrec', signed: true, params: params);
+  }
+
+  /// Fetch withdraw history (supporting network)
+  /// https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data
+  /// If both [startTime] and [endTime] are sent, time between [startTime] and [endTime] must be less than 90 days
+  /// If [withdrawOrderId] is sent, time between [startTime] and [endTime] must be less than 7 days
+  /// If [withdrawOrderId] is sent, [startTime] and [endTime] are not sent, will return last 7 days records by default
+  Future<ApiResponse> accountGetWithdrawHistory({
+    String? coin,
+    String? withdrawOrderId,
+    int? status, // 0:Email Sent, 1:Cancelled, 2:Awaiting Approval, 3:Rejected, 4:Processing, 5:Failure, 6:Completed
+    int? offset,
+    int? limit, // Default: 1000, Max: 1000
+    int? startTime, // Default: 90 days from current timestamp
+    int? endTime, // Default: present timestamp
+  }) async {
+    final params = {
+      if (coin != null) 'coin': coin,
+      if (withdrawOrderId != null) 'withdrawOrderId': withdrawOrderId,
+      if (status != null) 'status': status,
+      if (offset != null) 'offset': offset,
+      if (limit != null) 'limit': limit,
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+    };
+    return await requestMarginApi(HttpMethod.get, 'capital/withdraw/history', signed: true, params: params);
+  }
+
+  /// Fetch deposit address with network
+  /// https://binance-docs.github.io/apidocs/spot/en/#deposit-address-supporting-network-user_data
+  /// If [network] is not send, return with default [network] of the coin
+  /// You can get [network] and isDefault in networkList of a coin in the response of [coinsGetInfo]
+  Future<ApiResponse> accountGetDepositAddress({required String coin, String? network}) async {
+    final params = {'coin': coin, if (network != null) 'network': network};
+    return await requestMarginApi(HttpMethod.get, 'capital/deposit/address', signed: true, params: params);
   }
 
   // =================================================================================================================
@@ -484,19 +586,6 @@ class BnApi extends BaseClient {
 
   Future get_asset_details() async {
     return await requestMarginApi(HttpMethod.get, 'asset/assetDetail', signed: true);
-  }
-
-  // Withdraw Endpoints
-  Future withdraw({String? coin, String? name}) async {
-    // force a name for the withdrawal if one not set
-    final Map<String, dynamic> _params = {
-      if (coin != null && name == null) 'name': coin else if (name != null) 'name': name,
-    };
-    return await requestMarginApi(HttpMethod.post, 'capital/withdraw/apply', signed: true, params: _params);
-  }
-
-  Future get_deposit_history() async {
-    return await requestMarginApi(HttpMethod.get, 'capital/deposit/hisrec', signed: true);
   }
 
   Future get_withdraw_history() async {
@@ -1525,16 +1614,6 @@ class BnApi extends BaseClient {
   Future futures_coin_stream_close(String listenKey) async {
     final Map<String, dynamic> _params = {'listenKey': listenKey};
     return await requestFuturesCoinApi(HttpMethod.delete, 'listenKey', signed: false, params: _params);
-  }
-
-  Future disable_fast_withdraw_switch() async {
-    final Map<String, dynamic> _params = {};
-    return await requestFuturesCoinApi(HttpMethod.post, 'disableFastWithdrawSwitch', signed: true, params: _params);
-  }
-
-  Future enable_fast_withdraw_switch() async {
-    final Map<String, dynamic> _params = {};
-    return await requestFuturesCoinApi(HttpMethod.post, 'enableFastWithdrawSwitch', signed: true, params: _params);
   }
 
   /// =================================================================================================================

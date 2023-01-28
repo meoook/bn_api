@@ -5,6 +5,7 @@
 |         |            | Comments                                               |
 |         |            | Not serialized data for compute                        |
 |         |            | Serialized client                                      |
+| 0.1.11  | 28.01.2023 | Account and General methods and objects                |
 | 0.1.10  | 26.01.2023 | Optimize and some wallet endpoints                     |
 |  0.1.9  | 25.01.2023 | Debug mode (log all requests)                          |
 |  0.1.8  | 20.11.2022 | Objects: IsolatedMarginFee                             |

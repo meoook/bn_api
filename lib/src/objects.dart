@@ -1,9 +1,9 @@
 import 'dart:convert';
 export 'constants.dart';
-export 'objects/wallet_objects.dart';
+export 'objects/general_objects.dart';
+export 'objects/account_objects.dart';
 
 export 'objects/exchange_info.dart';
-export 'objects/acc_objects.dart';
 export 'objects/orders_objects.dart';
 export 'objects/ws_objects.dart';
 export 'objects/margin_objects.dart';

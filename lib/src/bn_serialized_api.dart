@@ -8,27 +8,64 @@ class BnSerializedApi {
       : _api = BnApi(apiKey: apiKey, apiSecret: apiSecret, debug: debug);
 
   // =================================================================================================================
-  // Wallet Endpoints
+  // General Endpoints
   // =================================================================================================================
-  Future<BnApiSystemStatus> getSystemStatus() async {
-    final Map _data = await _api.getSystemStatus().then((r) => r.json);
+  Future<BnApiSystemStatus> serverGetStatus() async {
+    final Map _data = await _api.serverGetStatus().then((r) => r.json);
     return BnApiSystemStatus(_data);
   }
 
-  Future<List<BnApiCoinInfo>> getAllCoinsInfo() async {
-    final List _data = await _api.getAllCoinsInfo().then((r) => r.json);
+  Future<List<BnApiCoinInfo>> coinsGetInfo() async {
+    final List _data = await _api.coinsGetInfo().then((r) => r.json);
     return List<BnApiCoinInfo>.from(_data.map((e) => BnApiCoinInfo(e)));
   }
 
-  Future<List<dynamic>> getAccountSnapshot(String type, {int? limit, int? startTime, int? endTime}) async {
-    final Map _data =
-        await _api.getAccountSnapshot(type, limit: limit, startTime: startTime, endTime: endTime).then((r) => r.json);
+  Future<List<dynamic>> accountGetSnapshot({required String type, int? limit, int? startTime, int? endTime}) async {
+    final Map _data = await _api
+        .accountGetSnapshot(type: type, limit: limit, startTime: startTime, endTime: endTime)
+        .then((r) => r.json);
     return List.from(_data['snapshotVos'].map((e) {
       if (e['type'].toUpperCase() == BnApiTradeType.spot) return BnApiAccountSnapshotSpot(e);
       if (e['type'].toUpperCase() == BnApiTradeType.margin) return BnApiAccountSnapshotMargin(e);
       if (e['type'].toUpperCase() == BnApiTradeType.futures) return BnApiAccountSnapshotFutures(e);
     }));
   }
+
+  Future<List<BnApiAccountDepositHistoryItem>> accountGetDepositHistory(
+      {String? coin, int? status, int? startTime, int? endTime, int? offset, int? limit}) async {
+    final List _data = await _api
+        .accountGetDepositHistory(
+            coin: coin, status: status, startTime: startTime, endTime: endTime, offset: offset, limit: limit)
+        .then((r) => r.json);
+    return List<BnApiAccountDepositHistoryItem>.from(_data.map((e) => BnApiAccountDepositHistoryItem(e)));
+  }
+
+  Future<List<BnApiAccountWithdrawHistoryItem>> accountGetWithdrawHistory(
+      {String? coin,
+      String? withdrawOrderId,
+      int? status,
+      int? offset,
+      int? limit,
+      int? startTime,
+      int? endTime}) async {
+    final List _data = await _api
+        .accountGetWithdrawHistory(
+            coin: coin,
+            withdrawOrderId: withdrawOrderId,
+            status: status,
+            offset: offset,
+            limit: limit,
+            startTime: startTime,
+            endTime: endTime)
+        .then((r) => r.json);
+    return List<BnApiAccountWithdrawHistoryItem>.from(_data.map((e) => BnApiAccountWithdrawHistoryItem(e)));
+  }
+
+  Future<BnApiAccountDepositAddress> accountGetDepositAddress({required String coin, String? network}) async {
+    final Map _data = await _api.accountGetDepositAddress(coin: coin, network: network).then((r) => r.json);
+    return BnApiAccountDepositAddress(_data);
+  }
+
   // =================================================================================================================
 
   Future<List<SymbolProduct>> productList() async {
