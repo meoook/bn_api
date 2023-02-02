@@ -111,3 +111,45 @@ class BnApiCoinInfo {
 }
 
 // =================================================================================================================
+
+class BnApiAssetWithdrawDetail {
+  final String asset;
+  final double minWithdrawAmount;
+  final bool depositStatus; // deposit status (false if ALL of networks' are false)
+  final double withdrawFee;
+  final bool withdrawStatus; // withdraw status (false if ALL of networks' are false)
+  final String? depositTip; // reason
+
+  BnApiAssetWithdrawDetail(this.asset, Map m)
+      : minWithdrawAmount = double.parse(m['minWithdrawAmount']),
+        depositStatus = m['depositStatus'],
+        withdrawFee = double.parse(m['withdrawFee']),
+        withdrawStatus = m['withdrawStatus'],
+        depositTip = m['depositTip'];
+
+  @override
+  String toString() {
+    return '$asset min: $minWithdrawAmount fee: $withdrawFee';
+  }
+}
+
+// =================================================================================================================
+
+class BnApiSymbolTradeFee {
+  final String symbol;
+  final double makerCommission;
+  final double takerCommission;
+
+  BnApiSymbolTradeFee(Map m)
+      : symbol = m['symbol'],
+        makerCommission = double.parse(m['makerCommission']),
+        takerCommission = double.parse(m['takerCommission']);
+
+  @override
+  String toString() {
+    return '$symbol maker-fee: $makerCommission taker-fee: $takerCommission';
+  }
+}
+
+// =================================================================================================================
+// =================================================================================================================

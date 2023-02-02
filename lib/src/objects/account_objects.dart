@@ -242,6 +242,190 @@ class BnApiAccountDepositAddress {
 }
 
 // =================================================================================================================
+
+class BnApiAccountTradingStatus {
+  final bool isLocked; // API trading function is locked or not
+  final DateTime? plannedRecoverTime; // If API trading function is locked, this is the planned recover time
+  // Trigger condition
+  final int gcr; // Number of GTC orders
+  final int ifer; // Number of FOK/IOC orders
+  final int ufr; // Number of orders
+  final DateTime updateTime;
+
+  BnApiAccountTradingStatus(Map m)
+      : isLocked = m['isLocked'],
+        plannedRecoverTime =
+            m['plannedRecoverTime'] == 0 ? DateTime.fromMillisecondsSinceEpoch(m['plannedRecoverTime']) : null,
+        gcr = m['triggerCondition']['GCR'],
+        ifer = m['triggerCondition']['IFER'],
+        ufr = m['triggerCondition']['UFR'],
+        updateTime = DateTime.fromMillisecondsSinceEpoch(m['updateTime']);
+
+  @override
+  String toString() {
+    return 'locked: $isLocked';
+  }
+}
+
+// =================================================================================================================
+
+class BnApiAccountBnbExchangeDetails {
+  final int transId;
+  final double serviceChargeAmount;
+  final double amount;
+  final DateTime operateTime;
+  final double transferedAmount;
+  final String fromAsset;
+
+  BnApiAccountBnbExchangeDetails(Map m)
+      : transId = m['transId'],
+        serviceChargeAmount = double.parse(m['serviceChargeAmount']),
+        amount = double.parse(m['amount']),
+        operateTime = DateTime.fromMillisecondsSinceEpoch(m['operateTime']),
+        transferedAmount = double.parse(m['transferedAmount']),
+        fromAsset = m['fromAsset'];
+
+  @override
+  String toString() {
+    return '$fromAsset $amount';
+  }
+}
+
+class BnApiAccountBnbExchange {
+  final DateTime operateTime;
+  final double totalTransferedAmount; // Total transfered BNB amount for this exchange
+  final double totalServiceChargeAmount; //Total service charge amount for this exchange
+  final int transId;
+  final List<BnApiAccountBnbExchangeDetails> userAssetDribbletDetails; // Details of  this exchange
+
+  BnApiAccountBnbExchange(Map m)
+      : operateTime = DateTime.fromMillisecondsSinceEpoch(m['operateTime']),
+        totalTransferedAmount = double.parse(m['totalTransferedAmount']),
+        totalServiceChargeAmount = double.parse(m['totalServiceChargeAmount']),
+        transId = m['transId'],
+        userAssetDribbletDetails = List<BnApiAccountBnbExchangeDetails>.from(
+            m['userAssetDribbletDetails'].map((e) => BnApiAccountBnbExchangeDetails(e)));
+
+  @override
+  String toString() {
+    return 'total amount $totalTransferedAmount BNB detail: $userAssetDribbletDetails';
+  }
+}
+
+// =================================================================================================================
+
+class BnApiAccountAssetAvailableToConvert {
+  final String asset;
+  final String assetFullName;
+  final double amountFree; // Convertible amount
+  final double toBTC; // BTC amount
+  final double toBNB; // BNB amount（Not deducted commission fee
+  final double toBNBOffExchange; // BNB amount（Deducted commission fee)
+  final double exchange; // Commission fee
+
+  BnApiAccountAssetAvailableToConvert(Map m)
+      : asset = m['asset'],
+        assetFullName = m['assetFullName'],
+        amountFree = double.parse(m['amountFree']),
+        toBTC = double.parse(m['toBTC']),
+        toBNB = double.parse(m['toBNB']),
+        toBNBOffExchange = double.parse(m['toBNBOffExchange']),
+        exchange = double.parse(m['exchange']);
+
+  @override
+  String toString() {
+    return '$asset $amountFree to BNB: $toBNB';
+  }
+}
+
+class BnApiAccountAssetsAvailableToConvert {
+  final double totalTransferBtc;
+  final double totalTransferBNB;
+  final double dribbletPercentage; // Commission fee
+  final List<BnApiAccountAssetAvailableToConvert> details;
+
+  BnApiAccountAssetsAvailableToConvert(Map m)
+      : totalTransferBtc = double.parse(m['totalTransferBtc']),
+        totalTransferBNB = double.parse(m['totalTransferBNB']),
+        dribbletPercentage = double.parse(m['dribbletPercentage']),
+        details = List<BnApiAccountAssetAvailableToConvert>.from(
+            m['details'].map((e) => BnApiAccountAssetAvailableToConvert(e)));
+
+  @override
+  String toString() {
+    return 'total to BNB: $totalTransferBNB details: $details';
+  }
+}
+
+// =================================================================================================================
+
+class BnApiAccountAssetConverted {
+  final String fromAsset;
+  final double amount;
+  final DateTime operateTime;
+  final double serviceChargeAmount;
+  final int tranId;
+  final double transferedAmount;
+
+  BnApiAccountAssetConverted(Map m)
+      : fromAsset = m['fromAsset'],
+        amount = double.parse(m['amount']),
+        operateTime = DateTime.fromMillisecondsSinceEpoch(m['operateTime']),
+        serviceChargeAmount = double.parse(m['serviceChargeAmount']),
+        tranId = m['tranId'],
+        transferedAmount = double.parse(m['transferedAmount']);
+
+  @override
+  String toString() {
+    return '$fromAsset amount: $amount';
+  }
+}
+
+class BnApiAccountAssetsConverted {
+  final double totalServiceCharge;
+  final double totalTransfered;
+  final List<BnApiAccountAssetConverted> transferResult;
+
+  BnApiAccountAssetsConverted(Map m)
+      : totalServiceCharge = double.parse(m['totalServiceCharge']),
+        totalTransfered = double.parse(m['totalTransfered']),
+        transferResult =
+            List<BnApiAccountAssetConverted>.from(m['transferResult'].map((e) => BnApiAccountAssetConverted(e)));
+
+  @override
+  String toString() {
+    return 'converted $totalTransfered result: $transferResult';
+  }
+}
+
+// =================================================================================================================
+
+class BnApiAccountAssetDividend {
+  final int id;
+  final String asset;
+  final double amount;
+  final DateTime divTime;
+  final String enInfo;
+  final int tranId;
+
+  BnApiAccountAssetDividend(Map m)
+      : id = m['id'],
+        asset = m['asset'],
+        amount = double.parse(m['amount']),
+        divTime = DateTime.fromMillisecondsSinceEpoch(m['divTime']),
+        enInfo = m['enInfo'],
+        tranId = m['tranId'];
+
+  @override
+  String toString() {
+    return '$asset $amount';
+  }
+}
+
+// =================================================================================================================
+// =================================================================================================================
+// =================================================================================================================
+// =================================================================================================================
 class AccPermissions {
   final bool ipRestrict;
   final DateTime createTime;

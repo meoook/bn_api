@@ -39,14 +39,29 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'capital/config/getall', signed: true);
   }
 
+  /// Assets details supported on Binance
+  /// Get network and other deposit or withdraw details from [coinsGetInfo]
+  /// https://binance-docs.github.io/apidocs/spot/en/#asset-detail-user_data
+  Future<ApiResponse> assetsGetWithdrawDetail({String? asset}) async {
+    final params = {if (asset != null) 'asset': asset};
+    return await requestMarginApi(HttpMethod.get, 'asset/assetDetail', signed: true, params: params);
+  }
+
+  /// Trade Fee for symbols
+  /// https://binance-docs.github.io/apidocs/spot/en/#trade-fee-user_data
+  Future<ApiResponse> symbolsTradeFee({String? symbol}) async {
+    final params = {if (symbol != null) 'symbol': symbol};
+    return await requestMarginApi(HttpMethod.get, 'asset/tradeFee', signed: true, params: params);
+  }
+
   // =================================================================================================================
   // Account Endpoints
   // =================================================================================================================
 
   /// Daily Account Snapshot
-  /// https://binance-docs.github.io/apidocs/spot/en/#daily-account-snapshot-user_data
   /// The [limit] time period must be less then 30 days
   /// If [startTime] and [endTime] not sent, return records of the last 7 days by default
+  /// https://binance-docs.github.io/apidocs/spot/en/#daily-account-snapshot-user_data
   Future<ApiResponse> accountGetSnapshot({required String type, int? limit, int? startTime, int? endTime}) async {
     final Map<String, dynamic> params = {
       'type': type, // BnApiTradeType: SPOT, MARGIN, FUTURES
@@ -58,23 +73,23 @@ class BnApi extends BaseClient {
   }
 
   /// Enable Fast Withdraw Switch
-  /// https://binance-docs.github.io/apidocs/spot/en/#enable-fast-withdraw-switch-user_data
   /// You need to enable "trade" option for the api key which requests this endpoint.
+  /// https://binance-docs.github.io/apidocs/spot/en/#enable-fast-withdraw-switch-user_data
   Future<bool> accountEnableFastWithdraw() async {
     return await requestMarginApi(HttpMethod.get, 'account/enableFastWithdrawSwitch', signed: true).then((r) => true);
   }
 
   /// Disable Fast Withdraw Switch
-  /// https://binance-docs.github.io/apidocs/spot/en/#disable-fast-withdraw-switch-user_data
   /// You need to enable "trade" option for the api key which requests this endpoint.
+  /// https://binance-docs.github.io/apidocs/spot/en/#disable-fast-withdraw-switch-user_data
   Future<bool> accountDisableFastWithdraw() async {
     return await requestMarginApi(HttpMethod.get, 'account/disableFastWithdrawSwitch', signed: true).then((r) => true);
   }
 
   /// Submit a withdraw request
-  /// https://binance-docs.github.io/apidocs/spot/en/#withdraw-user_data
   /// If [network] not send, return with default network of the coin
   /// You can get [network] and isDefault in networkList of a coin in the response of [coinsGetInfo]
+  /// https://binance-docs.github.io/apidocs/spot/en/#withdraw-user_data
   Future<String> accountWithdraw({
     required String coin,
     required String address,
@@ -102,8 +117,8 @@ class BnApi extends BaseClient {
   }
 
   /// Fetch deposit history (supporting network)
-  /// https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
   /// If both [startTime] and [endTime] are sent, time between [startTime] and [endTime] must be less than 90 days
+  /// https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
   Future<ApiResponse> accountGetDepositHistory({
     String? coin,
     int? status, // 0:pending, 6:credited but cannot withdraw, 1:success
@@ -124,10 +139,10 @@ class BnApi extends BaseClient {
   }
 
   /// Fetch withdraw history (supporting network)
-  /// https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data
   /// If both [startTime] and [endTime] are sent, time between [startTime] and [endTime] must be less than 90 days
   /// If [withdrawOrderId] is sent, time between [startTime] and [endTime] must be less than 7 days
   /// If [withdrawOrderId] is sent, [startTime] and [endTime] are not sent, will return last 7 days records by default
+  /// https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data
   Future<ApiResponse> accountGetWithdrawHistory({
     String? coin,
     String? withdrawOrderId,
@@ -150,12 +165,58 @@ class BnApi extends BaseClient {
   }
 
   /// Fetch deposit address with network
-  /// https://binance-docs.github.io/apidocs/spot/en/#deposit-address-supporting-network-user_data
   /// If [network] is not send, return with default [network] of the coin
   /// You can get [network] and isDefault in networkList of a coin in the response of [coinsGetInfo]
+  /// https://binance-docs.github.io/apidocs/spot/en/#deposit-address-supporting-network-user_data
   Future<ApiResponse> accountGetDepositAddress({required String coin, String? network}) async {
     final params = {'coin': coin, if (network != null) 'network': network};
     return await requestMarginApi(HttpMethod.get, 'capital/deposit/address', signed: true, params: params);
+  }
+
+  /// https://binance-docs.github.io/apidocs/spot/en/#account-status-user_data
+  Future<String> accountGetStatus() async {
+    return await requestMarginApi(HttpMethod.get, 'account/status', signed: true).then((r) => r.json['data']); // Normal
+  }
+
+  /// Account API Trading Status
+  /// https://binance-docs.github.io/apidocs/spot/en/#account-api-trading-status-user_data
+  Future<ApiResponse> accountGetTradingStatus() async {
+    return await requestMarginApi(HttpMethod.get, 'account/apiTradingStatus', signed: true);
+  }
+
+  /// Dust Log (Exchange assets to BNB)
+  /// return last 100 records
+  /// https://binance-docs.github.io/apidocs/spot/en/#dustlog-user_data
+  Future<ApiResponse> accountGetDustLog({int? startTime, int? endTime}) async {
+    final params = {if (startTime != null) 'startTime': startTime, if (endTime != null) 'endTime': endTime};
+    return await requestMarginApi(HttpMethod.get, 'asset/dribblet', signed: true, params: params);
+  }
+
+  /// Get Assets That Can Be Converted Into BNB
+  /// https://binance-docs.github.io/apidocs/spot/en/#get-assets-that-can-be-converted-into-bnb-user_data
+  Future<ApiResponse> accountGetAvailableToConvert() async {
+    return await requestMarginApi(HttpMethod.post, 'asset/dust-btc', signed: true);
+  }
+
+  /// Convert dust assets to BNB
+  /// You need `Enable Spot & Margin` trading permission for the API Key for this endpoint
+  /// https://binance-docs.github.io/apidocs/spot/en/#dust-transfer-user_data
+  Future<ApiResponse> accountConvertToBnb({required List<String> assets}) async {
+    if (assets.length > 1) throw Exception('not implemented for several coins'); // FIXME: for more than one coin
+    final params = {'asset': assets.join('&asset=')};
+    return await requestMarginApi(HttpMethod.post, 'asset/dust', signed: true, params: params);
+  }
+
+  /// Get asset(s) dividend records
+  /// https://binance-docs.github.io/apidocs/spot/en/#asset-dividend-record-user_data
+  Future<ApiResponse> accountAssetsDividends({String? asset, int? startTime, int? endTime, int? limit}) async {
+    final params = {
+      if (asset != null) 'asset': asset,
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+      if (limit != null) 'limit': limit // Default 20, max 500
+    };
+    return await requestMarginApi(HttpMethod.get, 'asset/assetDividend', signed: true, params: params);
   }
 
   // =================================================================================================================
@@ -545,32 +606,8 @@ class BnApi extends BaseClient {
     return await get('myTrades', signed: true);
   }
 
-  Future get_account_status() async {
-    return await requestMarginApi(HttpMethod.get, 'account/status', signed: true);
-  }
-
-  Future get_account_api_trading_status() async {
-    return await requestMarginApi(HttpMethod.get, 'account/apiTradingStatus', signed: true);
-  }
-
   Future getAccountApiPermissions() async {
     return await requestMarginApi(HttpMethod.get, 'account/apiRestrictions', signed: true);
-  }
-
-  Future get_dust_assets() async {
-    return await requestMarginApi(HttpMethod.post, 'asset/dust-btc', signed: true);
-  }
-
-  Future get_dust_log() async {
-    return await requestMarginApi(HttpMethod.get, 'asset/dribblet', signed: true);
-  }
-
-  Future transfer_dust() async {
-    return await requestMarginApi(HttpMethod.post, 'asset/dust', signed: true);
-  }
-
-  Future get_asset_dividend_history() async {
-    return await requestMarginApi(HttpMethod.get, 'asset/assetDividend', signed: true);
   }
 
   Future make_universal_transfcreateMarginOrderer() async {
@@ -579,14 +616,6 @@ class BnApi extends BaseClient {
 
   Future query_universal_transfer_history() async {
     return await requestMarginApi(HttpMethod.get, 'asset/transfer', signed: true);
-  }
-
-  Future get_trade_fee() async {
-    return await requestMarginApi(HttpMethod.get, 'asset/tradeFee', signed: true);
-  }
-
-  Future get_asset_details() async {
-    return await requestMarginApi(HttpMethod.get, 'asset/assetDetail', signed: true);
   }
 
   // User Stream Endpoints
