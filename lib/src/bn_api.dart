@@ -47,7 +47,7 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'asset/assetDetail', signed: true, params: params);
   }
 
-  /// Trade Fee for symbols
+  /// Trade fee for symbols
   /// https://binance-docs.github.io/apidocs/spot/en/#trade-fee-user_data
   Future<ApiResponse> symbolsTradeFee({String? symbol}) async {
     final params = {if (symbol != null) 'symbol': symbol};
@@ -217,6 +217,56 @@ class BnApi extends BaseClient {
       if (limit != null) 'limit': limit // Default 20, max 500
     };
     return await requestMarginApi(HttpMethod.get, 'asset/assetDividend', signed: true, params: params);
+  }
+
+  /// User universal transfer
+  /// You need to enable `Permits Universal Transfer` option for the API Key which requests this endpoint
+  /// [fromSymbol] must be sent when type are ISOLATEDMARGIN_MARGIN and ISOLATEDMARGIN_ISOLATEDMARGIN
+  /// [toSymbol] must be sent when type are MARGIN_ISOLATEDMARGIN and ISOLATEDMARGIN_ISOLATEDMARGIN
+  /// https://binance-docs.github.io/apidocs/spot/en/#user-universal-transfer-user_data
+  Future<int> accountUniversalTransfer({
+    required String type, // BnApiUniversalTransfer
+    required String asset,
+    required double amount,
+    String? fromSymbol,
+    String? toSymbol,
+  }) async {
+    final params = {
+      'type': type,
+      'asset': asset,
+      'amount': amount,
+      if (fromSymbol != null) 'fromSymbol': fromSymbol,
+      if (toSymbol != null) 'toSymbol': toSymbol
+    };
+    return await requestMarginApi(HttpMethod.post, 'asset/transfer', signed: true, params: params)
+        .then((r) => r.json['tranId']);
+  }
+
+  /// User universal transfer history
+  /// [fromSymbol] must be sent when type are ISOLATEDMARGIN_MARGIN and ISOLATEDMARGIN_ISOLATEDMARGIN
+  /// [toSymbol] must be sent when type are MARGIN_ISOLATEDMARGIN and ISOLATEDMARGIN_ISOLATEDMARGIN
+  /// Support query within the last 6 months only
+  /// If [startTime] and [endTime] not sent, return records of the last 7 days by default
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-user-universal-transfer-history-user_data
+  Future<ApiResponse> accountUniversalTransferHistory({
+    required String type, // BnApiUniversalTransfer
+    int? startTime,
+    int? endTime,
+    int? current, // Default 1
+    int? size, // Default 10, Max 100
+    String? fromSymbol,
+    String? toSymbol,
+  }) async {
+    final params = {
+      'type': type,
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+      if (current != null) 'current': current,
+      if (size != null) 'size': size,
+      if (fromSymbol != null) 'fromSymbol': fromSymbol,
+      if (toSymbol != null) 'toSymbol': toSymbol
+    };
+    return await requestMarginApi(HttpMethod.get, 'asset/transfer', signed: true, params: params);
   }
 
   // =================================================================================================================

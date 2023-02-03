@@ -119,3 +119,27 @@ class BnApiTimeFrame {
     '1M'
   ];
 }
+
+class BnApiUniversalTransfer {
+  static const String spotToFuture = "MAIN_UMFUTURE"; // Spot to USDⓈ-M Futures
+  static const String spotToCoinFuture = "MAIN_CMFUTURE"; // Spot to COIN-M Futures
+  static const String spotToCross = "MAIN_MARGIN"; // Spot to Margin (cross)
+  static const String futureToSpot = "UMFUTURE_MAIN"; // USDⓈ-M Futures to Spot
+  static const String futureToCross = "UMFUTURE_MARGIN"; // USDⓈ-M Futures to Margin（cross）account
+  static const String coinFutureToSpot = "CMFUTURE_MAIN"; // COIN-M Futures to Spot
+  static const String coinFutureToMargin = "CMFUTURE_MARGIN"; // COIN-M Futures to Margin(cross)
+  static const String crossToSpot = "MARGIN_MAIN"; // Margin（cross）to Spot
+  static const String crossToFuture = "MARGIN_UMFUTURE"; // Margin (cross) to USDⓈ-M Futures
+  static const String crossToCoinFuture = "MARGIN_CMFUTURE"; // Margin (cross) to COIN-M Futures
+  static const String isolatedToCross = "ISOLATEDMARGIN_MARGIN"; // Isolated margin to Margin (cross)
+  static const String crossToIsolated = "MARGIN_ISOLATEDMARGIN"; // Margin (cross) to Isolated margin
+  static const String isolatedToIsolated = "ISOLATEDMARGIN_ISOLATEDMARGIN"; // Isolated margin to Isolated margin
+  static const String spotToFunding = "MAIN_FUNDING"; // Spot to Funding
+  static const String fundingToSpot = "FUNDING_MAIN"; // Funding to Spot
+  static const String fundingToFuture = "FUNDING_UMFUTURE"; // Funding to USDⓈ-M Futures
+  static const String futureToFunding = "UMFUTURE_FUNDING"; // USDⓈ-M Futures to Funding
+  static const String marginToFunding = "MARGIN_FUNDING"; // Margin (cross) to Funding
+  static const String fundingToMargin = "FUNDING_MARGIN"; // Funding to Margin (cross)
+  static const String fundingToCoinFuture = "FUNDING_CMFUTURE"; // Funding to COIN-M Futures
+  static const String coinFutureToFunding = "CMFUTURE_FUNDING"; //  COIN-M Futures to Funding
+}

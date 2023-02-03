@@ -5,6 +5,7 @@ main() async {
   final String API_SECRET = '';
   final String symbol = 'LINKBUSD';
   final String asset = 'LINK';
+  final int startTime = DateTime.now().millisecondsSinceEpoch - const Duration(days: 30).inMilliseconds;
 
   final _binance = BnSerializedApi(apiKey: API_KEY, apiSecret: API_SECRET, debug: true);
 
@@ -44,8 +45,11 @@ main() async {
   // final assetsWithdrawDetail = await _binance.assetsGetWithdrawDetail(asset: asset);
   // print('Assets Withdraw Detail: $assetsWithdrawDetail');
 
-  final symbolsTradeFee = await _binance.symbolsTradeFee(symbol: symbol);
-  print('Symbols Trade Fee: $symbolsTradeFee');
+  // final symbolsTradeFee = await _binance.symbolsTradeFee(symbol: symbol);
+  // print('Symbols Trade Fee: $symbolsTradeFee');
+
+  final transferHistory = await _binance.accountUniversalTransferHistory(type: BnApiUniversalTransfer.crossToSpot);
+  print('Universal Transfer History: $transferHistory');
 
   // final List<SymbolProduct> _products = await _binance.productList();
   // print('Products ${_products}');

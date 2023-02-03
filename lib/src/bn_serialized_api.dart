@@ -103,6 +103,29 @@ class BnSerializedApi {
     return List<BnApiAccountAssetDividend>.from(_data['rows'].map((e) => BnApiAccountAssetDividend(e)));
   }
 
+  Future<List<BnApiAccountTransferItem>> accountUniversalTransferHistory({
+    required String type, // BnApiUniversalTransfer
+    int? startTime,
+    int? endTime,
+    int? current, // Default 1
+    int? size, // Default 10, Max 100
+    String? fromSymbol,
+    String? toSymbol,
+  }) async {
+    final Map _data = await _api
+        .accountUniversalTransferHistory(
+            type: type,
+            startTime: startTime,
+            endTime: endTime,
+            current: current,
+            size: size,
+            fromSymbol: fromSymbol,
+            toSymbol: toSymbol)
+        .then((r) => r.json);
+    if (_data['total'] == 0) return [];
+    return List<BnApiAccountTransferItem>.from(_data['rows'].map((e) => BnApiAccountTransferItem(e)));
+  }
+
   // print('Data: $_data');
 // =================================================================================================================
 

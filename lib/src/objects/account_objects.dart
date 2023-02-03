@@ -423,6 +423,29 @@ class BnApiAccountAssetDividend {
 }
 
 // =================================================================================================================
+
+class BnApiAccountTransferItem {
+  final String asset;
+  final double amount;
+  final String type; // BnApiUniversalTransfer
+  final String status; // status: CONFIRMED / FAILED / PENDING
+  final int tranId;
+  final DateTime timestamp;
+
+  BnApiAccountTransferItem(Map m)
+      : asset = m['asset'],
+        amount = double.parse(m['amount']),
+        type = m['type'],
+        status = m['status'],
+        tranId = m['tranId'],
+        timestamp = DateTime.fromMillisecondsSinceEpoch(m['timestamp']);
+
+  @override
+  String toString() {
+    return '$asset $amount $type';
+  }
+}
+
 // =================================================================================================================
 // =================================================================================================================
 // =================================================================================================================
