@@ -219,7 +219,7 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'asset/assetDividend', signed: true, params: params);
   }
 
-  /// User universal transfer
+  /// User universal transfer TODO: not tested
   /// You need to enable `Permits Universal Transfer` option for the API Key which requests this endpoint
   /// [fromSymbol] must be sent when type are ISOLATEDMARGIN_MARGIN and ISOLATEDMARGIN_ISOLATEDMARGIN
   /// [toSymbol] must be sent when type are MARGIN_ISOLATEDMARGIN and ISOLATEDMARGIN_ISOLATEDMARGIN
@@ -269,6 +269,128 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'asset/transfer', signed: true, params: params);
   }
 
+  /// Funding Wallet
+  /// Currently supports querying the following business assets:
+  ///   Binance Pay, Binance Card, Binance Gift Card, Stock Token
+  /// https://binance-docs.github.io/apidocs/spot/en/#funding-wallet-user_data
+  Future<ApiResponse> accountFundingWallet({String? asset, bool? needBtcValuation}) async {
+    final params = {
+      if (asset != null) 'asset': asset,
+      if (needBtcValuation != null) 'needBtcValuation': needBtcValuation
+    };
+    return await requestMarginApi(HttpMethod.post, 'asset/get-funding-asset', signed: true, params: params);
+  }
+
+  /// Get user assets, just for positive data
+  /// If [asset] is set, then return this asset, otherwise return all assets positive
+  /// If [needBtcValuation] is set, then return btcValuation
+  /// https://binance-docs.github.io/apidocs/spot/en/#user-asset-user_data
+  Future<ApiResponse> accountUserAsset({String? asset, bool? needBtcValuation}) async {
+    final params = {
+      if (asset != null) 'asset': asset,
+      if (needBtcValuation != null) 'needBtcValuation': needBtcValuation
+    };
+    return await requestMarginApi(HttpMethod.get, 'asset/getUserAsset', signed: true, params: params);
+  }
+
+  /// Convert transfer, convert between BUSD and stablecoins TODO: not tested
+  /// If the [clientTranId] has been used before, will not do the convert transfer,
+  ///   the original transfer will be returned
+  Future<ApiResponse> accountConvertBusd({
+    required String clientTranId, // The unique user-defined transaction id, min length 20
+    required String asset, // The current asset
+    required double amount, // The amount must be positive number
+    required String targetAsset, // Target asset you want to convert
+    String? accountType, // Only MAIN and CARD, default MAIN
+  }) async {
+    final params = {
+      'clientTranId': clientTranId,
+      'asset': asset,
+      'amount': amount,
+      'targetAsset': targetAsset,
+      if (accountType != null) 'accountType': accountType
+    };
+    return await requestMarginApi(HttpMethod.get, 'asset/convert-transfer', signed: true, params: params);
+  }
+
+  /// BUSD convert history TODO: not tested
+  /// https://binance-docs.github.io/apidocs/spot/en/#busd-convert-history-user_data
+  Future<ApiResponse> accountConvertBusdHistory({
+    int? tranId, // The transaction id
+    String? clientTranId, // The user-defined transaction id
+    String? asset, // If it is blank, we will match deducted asset and target asset.
+    required int startTime,
+    required int endTime,
+    String? accountType, // MAIN: main account. CARD: funding account. If it is blank, query spot and card wallet
+    int? current, // current page, default 1, the min value is 1
+    int? size, // page size, default 10, the max value is 100
+  }) async {
+    final params = {
+      if (tranId != null) 'tranId': tranId,
+      if (clientTranId != null) 'clientTranId': clientTranId,
+      if (asset != null) 'asset': asset,
+      'startTime': startTime,
+      'endTime': endTime,
+      if (accountType != null) 'accountType': accountType,
+      if (current != null) 'current': current,
+      if (size != null) 'size': size,
+    };
+    return await requestMarginApi(HttpMethod.get, 'asset/convert-transfer/queryByPage', signed: true, params: params);
+  }
+
+  /// Cloud-Mining payment and refund history
+  /// Just return the SUCCESS records of payment and refund
+  /// https://binance-docs.github.io/apidocs/spot/en/#get-cloud-mining-payment-and-refund-history-user_data
+  Future<ApiResponse> accountCloudMiningHistory({
+    int? tranId, // The transaction id
+    String? clientTranId, // The user-defined transaction id
+    String? asset, // If it is blank, we will match deducted asset and target asset.
+    required int startTime,
+    required int endTime,
+    String? accountType, // MAIN: main account. CARD: funding account. If it is blank, query spot and card wallet
+    int? current, // current page, default 1, the min value is 1
+    int? size, // page size, default 10, the max value is 100
+  }) async {
+    final params = {
+      if (tranId != null) 'tranId': tranId,
+      if (clientTranId != null) 'clientTranId': clientTranId,
+      if (asset != null) 'asset': asset,
+      'startTime': startTime,
+      'endTime': endTime,
+      if (accountType != null) 'accountType': accountType,
+      if (current != null) 'current': current,
+      if (size != null) 'size': size,
+    };
+    return await requestMarginApi(HttpMethod.get, 'asset/ledger-transfer/cloud-mining/queryByPage',
+        signed: true, params: params);
+  }
+
+  /// API key permission
+  /// https://binance-docs.github.io/apidocs/spot/en/#get-api-key-permission-user_data
+  Future<ApiResponse> accountApiPermissions() async {
+    return await requestMarginApi(HttpMethod.get, 'account/apiRestrictions', signed: true);
+  }
+
+  /// Get a user's auto-conversion settings in deposit/withdrawal
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-auto-converting-stable-coins-user_data
+  Future<ApiResponse> accountConvertingStableCoins() async {
+    return await requestMarginApi(HttpMethod.get, 'capital/contract/convertible-coins', signed: true);
+  }
+
+  /// Switch on/off BUSD and stable coins conversion
+  /// https://binance-docs.github.io/apidocs/spot/en/#switch-on-off-busd-and-stable-coins-conversion-user_data
+  Future<bool> accountConvertStableCoins({
+    required String coin, // Must be USDC, USDP or TUSD
+    required bool enable, // true: turn on the auto-conversion. false: turn off the auto-conversion
+  }) async {
+    final params = {'coin': coin, 'enable': enable};
+    return await requestMarginApi(HttpMethod.post, 'capital/contract/convertible-coins', signed: true, params: params)
+        .then((r) => true);
+  }
+
+  // =================================================================================================================
+  // Sub-Account Endpoints
+  // =================================================================================================================
   // =================================================================================================================
   // =================================================================================================================
 
@@ -654,18 +776,6 @@ class BnApi extends BaseClient {
 
   Future get_my_trades() async {
     return await get('myTrades', signed: true);
-  }
-
-  Future getAccountApiPermissions() async {
-    return await requestMarginApi(HttpMethod.get, 'account/apiRestrictions', signed: true);
-  }
-
-  Future make_universal_transfcreateMarginOrderer() async {
-    return await requestMarginApi(HttpMethod.post, 'asset/transfer', signed: true);
-  }
-
-  Future query_universal_transfer_history() async {
-    return await requestMarginApi(HttpMethod.get, 'asset/transfer', signed: true);
   }
 
   // User Stream Endpoints
@@ -1548,16 +1658,6 @@ class BnApi extends BaseClient {
   Future futures_coin_leverage_bracket() async {
     final Map<String, dynamic> _params = {};
     return await requestFuturesCoinApi(HttpMethod.get, 'leverageBracket', signed: true, version: 2, params: _params);
-  }
-
-  Future new_transfer_history() async {
-    final Map<String, dynamic> _params = {};
-    return await requestFuturesCoinApi(HttpMethod.get, 'asset/transfer', signed: true, params: _params);
-  }
-
-  Future universal_transfer() async {
-    final Map<String, dynamic> _params = {};
-    return await requestFuturesCoinApi(HttpMethod.post, 'asset/transfer', signed: true, params: _params);
   }
 
   Future futures_coin_create_order() async {

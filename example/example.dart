@@ -5,7 +5,8 @@ main() async {
   final String API_SECRET = '';
   final String symbol = 'LINKBUSD';
   final String asset = 'LINK';
-  final int startTime = DateTime.now().millisecondsSinceEpoch - const Duration(days: 30).inMilliseconds;
+  final int endTime = DateTime.now().millisecondsSinceEpoch;
+  final int startTime = endTime - const Duration(days: 30).inMilliseconds;
 
   final _binance = BnSerializedApi(apiKey: API_KEY, apiSecret: API_SECRET, debug: true);
 
@@ -48,8 +49,29 @@ main() async {
   // final symbolsTradeFee = await _binance.symbolsTradeFee(symbol: symbol);
   // print('Symbols Trade Fee: $symbolsTradeFee');
 
-  final transferHistory = await _binance.accountUniversalTransferHistory(type: BnApiUniversalTransfer.crossToSpot);
-  print('Universal Transfer History: $transferHistory');
+  // final transferHistory = await _binance.accountUniversalTransferHistory(type: BnApiUniversalTransfer.crossToSpot);
+  // print('Universal Transfer History: $transferHistory');
+
+  // final fundingWallet = await _binance.accountFundingWallet(needBtcValuation: true);
+  // print('Funding Wallet: $fundingWallet');
+
+  // final accountUserAsset = await _binance.accountUserAsset(needBtcValuation: true);
+  // print('User Assets: $accountUserAsset');
+
+  // final accountConvertBusdHistory = await _binance.accountConvertBusdHistory(startTime: startTime, endTime: endTime);
+  // print('Convert Busd History: $accountConvertBusdHistory');
+
+  // final accountCloudMiningHistory = await _binance.accountCloudMiningHistory(startTime: startTime, endTime: endTime);
+  // print('Cloud Mining History: $accountCloudMiningHistory');
+
+  // final accountApiPermissions = await _binance.accountApiPermissions();
+  // print('Account Api Permissions: $accountApiPermissions');
+
+  // final accountConvertStableCoins = await _binance.accountConvertStableCoins(coin: 'USDC', enable: true);
+  // print('Convert Stable Coins: $accountConvertStableCoins');
+
+  final accountConvertingStableCoins = await _binance.accountConvertingStableCoins();
+  print('Converting Stable Coins: $accountConvertingStableCoins');
 
   // final List<SymbolProduct> _products = await _binance.productList();
   // print('Products ${_products}');

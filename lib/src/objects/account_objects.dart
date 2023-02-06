@@ -447,25 +447,122 @@ class BnApiAccountTransferItem {
 }
 
 // =================================================================================================================
+
+class BnApiAccountFundingWallet {
+  final String asset;
+  final double free; // available balance
+  final double locked; // locked asset
+  final double freeze; // freeze asset
+  final double withdrawing;
+  final int? updateId;
+  final double? btcValuation;
+
+  BnApiAccountFundingWallet(Map m)
+      : asset = m['asset'],
+        free = double.parse(m['free']),
+        locked = double.parse(m['locked']),
+        freeze = double.parse(m['freeze']),
+        withdrawing = double.parse(m['withdrawing']),
+        btcValuation = m['btcValuation'] == null ? null : double.parse(m['btcValuation']),
+        updateId = m['updateId'];
+
+  @override
+  String toString() {
+    return '$asset free: $free locked: $locked freeze: $freeze';
+  }
+}
+
 // =================================================================================================================
+
+class BnApiAccountBusdConvert {
+  final String asset;
+  final int tranId;
+
+  BnApiAccountBusdConvert(Map m)
+      : asset = m['asset'],
+        tranId = m['tranId'];
+
+  @override
+  String toString() {
+    return '$asset';
+  }
+}
+
 // =================================================================================================================
-class AccPermissions {
+
+class BnApiAccountBusdConvertItem {
+  final int tranId;
+  final int type;
+  final DateTime time;
+  final String deductedAsset;
+  final double deductedAmount;
+  final String targetAsset;
+  final double targetAmount;
+  final String status;
+  final String accountType;
+
+  BnApiAccountBusdConvertItem(Map m)
+      : tranId = m['tranId'],
+        type = m['type'],
+        time = DateTime.fromMillisecondsSinceEpoch(m['time']),
+        deductedAsset = m['deductedAsset'],
+        deductedAmount = double.parse(m['deductedAmount']),
+        targetAsset = m['targetAsset'],
+        targetAmount = double.parse(m['targetAmount']),
+        status = m['status'],
+        accountType = m['accountType'];
+
+  @override
+  String toString() {
+    return '$deductedAmount $deductedAsset';
+  }
+}
+
+// =================================================================================================================
+
+class BnApiAccountCloudMining {
+  final DateTime createTime;
+  final int tranId;
+  final int type; // 248 - payment, 249 - refund
+  final String asset;
+  final double amount;
+  final String status; // S - SUCCESS
+
+  BnApiAccountCloudMining(Map m)
+      : createTime = DateTime.fromMillisecondsSinceEpoch(m['createTime']),
+        tranId = m['tranId'],
+        type = m['type'],
+        asset = m['asset'],
+        amount = double.parse(m['amount']),
+        status = m['status'];
+
+  @override
+  String toString() {
+    return '$asset $amount';
+  }
+}
+
+// =================================================================================================================
+
+class BnApiAccountPermissions {
   final bool ipRestrict;
   final DateTime createTime;
-  final DateTime tradingAuthorityExpirationTime;
+  final DateTime? tradingAuthorityExpirationTime; // Expiration time for spot and margin trading permission
   final bool enableReading;
-  final bool enableSpotAndMarginTrading;
-  final bool enableWithdrawals;
-  final bool enableInternalTransfer;
-  final bool enableMargin;
-  final bool enableFutures;
-  final bool permitsUniversalTransfer;
-  final bool enableVanillaOptions;
+  final bool enableSpotAndMarginTrading; // Spot and margin trading
+  final bool enableWithdrawals; // Enable withdraw via API
+  final bool enableInternalTransfer; // Enable transfer funds between your master account and your sub account instantly
+  final bool enableMargin; //  This option can be adjusted after the Cross Margin account transfer is completed
+  final bool enableFutures; //  API Key created before your futures account opened does not support futures API service
+  final bool permitsUniversalTransfer; // Enable dedicated universal transfer API to transfer multiple currencies
+  final bool enableVanillaOptions; //  Authorizes this key to Vanilla options trading
 
-  AccPermissions(Map m)
+  BnApiAccountPermissions(Map m)
       : ipRestrict = m['ipRestrict'],
         createTime = DateTime.fromMillisecondsSinceEpoch(m['createTime']),
-        tradingAuthorityExpirationTime = DateTime.fromMillisecondsSinceEpoch(m['tradingAuthorityExpirationTime']),
+        tradingAuthorityExpirationTime = m['tradingAuthorityExpirationTime'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(m['tradingAuthorityExpirationTime']),
         enableReading = m['enableReading'],
         enableSpotAndMarginTrading = m['enableSpotAndMarginTrading'],
         enableWithdrawals = m['enableWithdrawals'],
@@ -480,6 +577,29 @@ class AccPermissions {
     return 'spot: $enableSpotAndMarginTrading margin: $enableMargin futures: $enableFutures';
   }
 }
+
+// =================================================================================================================
+
+class BnApiConvertingStableCoins {
+  final bool convertEnabled;
+  final List<String> coins;
+  final Map<String, int> exchangeRates;
+
+  BnApiConvertingStableCoins(Map m)
+      : convertEnabled = m['convertEnabled'],
+        coins = List<String>.from(m['coins'].map((e) => '$e')),
+        exchangeRates =
+            Map.fromIterable(m['exchangeRates'].entries, key: (e) => e.key, value: (e) => int.parse(e.value));
+
+  @override
+  String toString() {
+    return '${convertEnabled ? 'enabled' : 'disabled'} rates: $exchangeRates';
+  }
+}
+
+// =================================================================================================================
+// =================================================================================================================
+// =================================================================================================================
 
 class AccBalance {
   final String asset;

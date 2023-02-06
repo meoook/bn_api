@@ -9,31 +9,31 @@ class BnSerializedApi {
 
   // ========= General Endpoints ===============
   Future<BnApiSystemStatus> serverGetStatus() async {
-    final Map _data = await _api.serverGetStatus().then((r) => r.json);
-    return BnApiSystemStatus(_data);
+    final Map data = await _api.serverGetStatus().then((r) => r.json);
+    return BnApiSystemStatus(data);
   }
 
   Future<List<BnApiCoinInfo>> coinsGetInfo() async {
-    final List _data = await _api.coinsGetInfo().then((r) => r.json);
-    return List<BnApiCoinInfo>.from(_data.map((e) => BnApiCoinInfo(e)));
+    final List data = await _api.coinsGetInfo().then((r) => r.json);
+    return List<BnApiCoinInfo>.from(data.map((e) => BnApiCoinInfo(e)));
   }
 
   Future<List<BnApiAssetWithdrawDetail>> assetsGetWithdrawDetail({String? asset}) async {
-    final Map _data = await _api.assetsGetWithdrawDetail(asset: asset).then((r) => r.json);
-    return List<BnApiAssetWithdrawDetail>.from(_data.entries.map((e) => BnApiAssetWithdrawDetail(e.key, e.value)));
+    final Map data = await _api.assetsGetWithdrawDetail(asset: asset).then((r) => r.json);
+    return List<BnApiAssetWithdrawDetail>.from(data.entries.map((e) => BnApiAssetWithdrawDetail(e.key, e.value)));
   }
 
   Future<List<BnApiSymbolTradeFee>> symbolsTradeFee({String? symbol}) async {
-    final List _data = await _api.symbolsTradeFee(symbol: symbol).then((r) => r.json);
-    return List<BnApiSymbolTradeFee>.from(_data.map((e) => BnApiSymbolTradeFee(e)));
+    final List data = await _api.symbolsTradeFee(symbol: symbol).then((r) => r.json);
+    return List<BnApiSymbolTradeFee>.from(data.map((e) => BnApiSymbolTradeFee(e)));
   }
 
   // ========= Account Endpoints ===============
   Future<List<dynamic>> accountGetSnapshot({required String type, int? limit, int? startTime, int? endTime}) async {
-    final Map _data = await _api
+    final Map data = await _api
         .accountGetSnapshot(type: type, limit: limit, startTime: startTime, endTime: endTime)
         .then((r) => r.json);
-    return List.from(_data['snapshotVos'].map((e) {
+    return List.from(data['snapshotVos'].map((e) {
       if (e['type'].toUpperCase() == BnApiTradeType.spot) return BnApiAccountSnapshotSpot(e);
       if (e['type'].toUpperCase() == BnApiTradeType.margin) return BnApiAccountSnapshotMargin(e);
       if (e['type'].toUpperCase() == BnApiTradeType.futures) return BnApiAccountSnapshotFutures(e);
@@ -42,22 +42,23 @@ class BnSerializedApi {
 
   Future<List<BnApiAccountDepositHistoryItem>> accountGetDepositHistory(
       {String? coin, int? status, int? startTime, int? endTime, int? offset, int? limit}) async {
-    final List _data = await _api
+    final List data = await _api
         .accountGetDepositHistory(
             coin: coin, status: status, startTime: startTime, endTime: endTime, offset: offset, limit: limit)
         .then((r) => r.json);
-    return List<BnApiAccountDepositHistoryItem>.from(_data.map((e) => BnApiAccountDepositHistoryItem(e)));
+    return List<BnApiAccountDepositHistoryItem>.from(data.map((e) => BnApiAccountDepositHistoryItem(e)));
   }
 
-  Future<List<BnApiAccountWithdrawHistoryItem>> accountGetWithdrawHistory(
-      {String? coin,
-      String? withdrawOrderId,
-      int? status,
-      int? offset,
-      int? limit,
-      int? startTime,
-      int? endTime}) async {
-    final List _data = await _api
+  Future<List<BnApiAccountWithdrawHistoryItem>> accountGetWithdrawHistory({
+    String? coin,
+    String? withdrawOrderId,
+    int? status,
+    int? offset,
+    int? limit,
+    int? startTime,
+    int? endTime,
+  }) async {
+    final List data = await _api
         .accountGetWithdrawHistory(
             coin: coin,
             withdrawOrderId: withdrawOrderId,
@@ -67,40 +68,40 @@ class BnSerializedApi {
             startTime: startTime,
             endTime: endTime)
         .then((r) => r.json);
-    return List<BnApiAccountWithdrawHistoryItem>.from(_data.map((e) => BnApiAccountWithdrawHistoryItem(e)));
+    return List<BnApiAccountWithdrawHistoryItem>.from(data.map((e) => BnApiAccountWithdrawHistoryItem(e)));
   }
 
   Future<BnApiAccountDepositAddress> accountGetDepositAddress({required String coin, String? network}) async {
-    final Map _data = await _api.accountGetDepositAddress(coin: coin, network: network).then((r) => r.json);
-    return BnApiAccountDepositAddress(_data);
+    final Map data = await _api.accountGetDepositAddress(coin: coin, network: network).then((r) => r.json);
+    return BnApiAccountDepositAddress(data);
   }
 
   Future<BnApiAccountTradingStatus> accountGetTradingStatus() async {
-    final Map _data = await _api.accountGetTradingStatus().then((r) => r.json);
-    return BnApiAccountTradingStatus(_data['data']);
+    final Map data = await _api.accountGetTradingStatus().then((r) => r.json);
+    return BnApiAccountTradingStatus(data['data']);
   }
 
   Future<List<BnApiAccountBnbExchange>> accountGetDustLog({int? startTime, int? endTime}) async {
-    final Map _data = await _api.accountGetDustLog(startTime: startTime, endTime: endTime).then((r) => r.json);
-    return List<BnApiAccountBnbExchange>.from(_data['userAssetDribblets'].map((e) => BnApiAccountBnbExchange(e)));
+    final Map data = await _api.accountGetDustLog(startTime: startTime, endTime: endTime).then((r) => r.json);
+    return List<BnApiAccountBnbExchange>.from(data['userAssetDribblets'].map((e) => BnApiAccountBnbExchange(e)));
   }
 
   Future<BnApiAccountAssetsAvailableToConvert> accountGetAvailableToConvert() async {
-    final Map _data = await _api.accountGetAvailableToConvert().then((r) => r.json);
-    return BnApiAccountAssetsAvailableToConvert(_data);
+    final Map data = await _api.accountGetAvailableToConvert().then((r) => r.json);
+    return BnApiAccountAssetsAvailableToConvert(data);
   }
 
   Future<BnApiAccountAssetsConverted> accountGetConvertToBnb({required List<String> assets}) async {
-    final Map _data = await _api.accountConvertToBnb(assets: assets).then((r) => r.json);
-    return BnApiAccountAssetsConverted(_data);
+    final Map data = await _api.accountConvertToBnb(assets: assets).then((r) => r.json);
+    return BnApiAccountAssetsConverted(data);
   }
 
   Future<List<BnApiAccountAssetDividend>> accountAssetsDividends(
       {String? asset, int? startTime, int? endTime, int? limit}) async {
-    final Map _data = await _api
+    final Map data = await _api
         .accountAssetsDividends(asset: asset, startTime: startTime, endTime: endTime, limit: limit)
         .then((r) => r.json);
-    return List<BnApiAccountAssetDividend>.from(_data['rows'].map((e) => BnApiAccountAssetDividend(e)));
+    return List<BnApiAccountAssetDividend>.from(data['rows'].map((e) => BnApiAccountAssetDividend(e)));
   }
 
   Future<List<BnApiAccountTransferItem>> accountUniversalTransferHistory({
@@ -112,7 +113,7 @@ class BnSerializedApi {
     String? fromSymbol,
     String? toSymbol,
   }) async {
-    final Map _data = await _api
+    final Map data = await _api
         .accountUniversalTransferHistory(
             type: type,
             startTime: startTime,
@@ -122,11 +123,100 @@ class BnSerializedApi {
             fromSymbol: fromSymbol,
             toSymbol: toSymbol)
         .then((r) => r.json);
-    if (_data['total'] == 0) return [];
-    return List<BnApiAccountTransferItem>.from(_data['rows'].map((e) => BnApiAccountTransferItem(e)));
+    if (data['total'] == 0) return [];
+    return List<BnApiAccountTransferItem>.from(data['rows'].map((e) => BnApiAccountTransferItem(e)));
   }
 
-  // print('Data: $_data');
+  Future<List<BnApiAccountFundingWallet>> accountFundingWallet({String? asset, bool? needBtcValuation}) async {
+    final List data =
+        await _api.accountFundingWallet(asset: asset, needBtcValuation: needBtcValuation).then((r) => r.json);
+    return List<BnApiAccountFundingWallet>.from(data.map((e) => BnApiAccountFundingWallet(e)));
+  }
+
+  Future<List<BnApiAccountFundingWallet>> accountUserAsset({String? asset, bool? needBtcValuation}) async {
+    final List data = await _api.accountUserAsset(asset: asset, needBtcValuation: needBtcValuation).then((r) => r.json);
+    return List<BnApiAccountFundingWallet>.from(data.map((e) => BnApiAccountFundingWallet(e)));
+  }
+
+  Future<BnApiAccountBusdConvert> accountConvertBusd({
+    required String clientTranId,
+    required String asset,
+    required double amount,
+    required String targetAsset,
+    String? accountType,
+  }) async {
+    final Map data = await _api
+        .accountConvertBusd(
+            clientTranId: clientTranId,
+            asset: asset,
+            amount: amount,
+            targetAsset: targetAsset,
+            accountType: accountType)
+        .then((r) => r.json);
+    return BnApiAccountBusdConvert(data);
+  }
+
+  Future<List<BnApiAccountBusdConvertItem>> accountConvertBusdHistory({
+    int? tranId,
+    String? clientTranId,
+    String? asset,
+    required int startTime,
+    required int endTime,
+    String? accountType,
+    int? current,
+    int? size,
+  }) async {
+    final Map data = await _api
+        .accountConvertBusdHistory(
+            tranId: tranId,
+            clientTranId: clientTranId,
+            startTime: startTime,
+            endTime: endTime,
+            accountType: accountType,
+            current: current,
+            size: size)
+        .then((r) => r.json);
+    return List<BnApiAccountBusdConvertItem>.from(data['rows'].map((e) => BnApiAccountBusdConvertItem(e)));
+  }
+
+  Future<List<BnApiAccountCloudMining>> accountCloudMiningHistory({
+    int? tranId,
+    String? clientTranId,
+    String? asset,
+    required int startTime,
+    required int endTime,
+    String? accountType,
+    int? current,
+    int? size,
+  }) async {
+    final Map data = await _api
+        .accountCloudMiningHistory(
+            tranId: tranId,
+            clientTranId: clientTranId,
+            startTime: startTime,
+            endTime: endTime,
+            accountType: accountType,
+            current: current,
+            size: size)
+        .then((r) => r.json);
+    return List<BnApiAccountCloudMining>.from(data['rows'].map((e) => BnApiAccountCloudMining(e)));
+  }
+
+  Future<BnApiAccountPermissions> accountApiPermissions() async {
+    final Map data = await _api.accountApiPermissions().then((r) => r.json);
+    return BnApiAccountPermissions(data);
+  }
+
+  Future<BnApiConvertingStableCoins> accountConvertingStableCoins() async {
+    final Map data = await _api.accountConvertingStableCoins().then((r) => r.json);
+    return BnApiConvertingStableCoins(data);
+  }
+
+  Future<bool> accountConvertStableCoins({required String coin, required bool enable}) async {
+    return await _api.accountConvertStableCoins(coin: coin, enable: enable);
+  }
+
+  // print('Data: $data');
 // =================================================================================================================
 
   Future<List<SymbolProduct>> productList() async {
@@ -137,11 +227,6 @@ class BnSerializedApi {
   Future<ExchangeInfo> getExchangeInfo() async {
     final Map _data = await _api.getExchangeInfo().then((r) => r.json);
     return ExchangeInfo(_data);
-  }
-
-  Future<AccPermissions> getAccountApiPermissions() async {
-    final Map _data = await _api.getAccountApiPermissions().then((r) => r.json);
-    return AccPermissions(_data);
   }
 
   Future<AccInfo> getAccount() async {
