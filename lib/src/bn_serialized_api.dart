@@ -216,6 +216,10 @@ class BnSerializedApi {
     return await _api.accountConvertStableCoins(coin: coin, enable: enable);
   }
 
+  Future<BnApiBnbBurnSpotMargin> accountGetBnbBurnSpotMargin() async {
+    return await _api.accountGetBnbBurnSpotMargin().then((r) => BnApiBnbBurnSpotMargin(r.json));
+  }
+
   // ========= Margin Account/Trade Endpoints ===============
   Future<List<BnApiMarginBorrowItem>> marginAccountBorrowDetails({
     required String asset,
@@ -319,7 +323,7 @@ class BnSerializedApi {
     return BnApiMarginOrder(data);
   }
 
-  Future<BnApiMarginOrder> marginCancelOrder({
+  Future<BnApiMarginOrderCancel> marginCancelOrder({
     required String symbol,
     bool? isIsolated, // isolated margin or not, default false
     int? orderId,
@@ -334,12 +338,13 @@ class BnSerializedApi {
             origClientOrderId: origClientOrderId,
             newClientOrderId: newClientOrderId)
         .then((r) => r.json);
-    return BnApiMarginOrder(data);
+    return BnApiMarginOrderCancel(data);
   }
 
-  Future<List<BnApiMarginOrder>> marginCancelOrders({required String symbol, bool? isIsolated}) async {
+  Future<List<BnApiMarginOrderCancel>> marginCancelOrders({required String symbol, bool? isIsolated}) async {
     final List data = await _api.marginCancelOrders(symbol: symbol, isIsolated: isIsolated).then((r) => r.json);
-    return List<BnApiMarginOrder>.from(data.map((e) => BnApiMarginOrder(e)));
+    // TODO: can also return BnApiMarginListOrder
+    return List<BnApiMarginOrderCancel>.from(data.map((e) => BnApiMarginOrderCancel(e)));
   }
 
   Future<List<BnApiMarginTransferItem>> marginTransferWithSpotHistory({
@@ -447,7 +452,7 @@ class BnSerializedApi {
     int? fromId, // TradeId to fetch from. Default gets most recent trades
     int? limit, // Default 500; max 1000.
   }) async {
-    final List _data = await _api
+    final List data = await _api
         .marginGetTrades(
             symbol: symbol,
             isIsolated: isIsolated,
@@ -457,7 +462,85 @@ class BnSerializedApi {
             fromId: fromId,
             limit: limit)
         .then((r) => r.json);
-    return List<BnApiMarginTrade>.from(_data.map((e) => BnApiMarginTrade(e)));
+    return List<BnApiMarginTrade>.from(data.map((e) => BnApiMarginTrade(e)));
+  }
+
+  Future<List<BnApiMarginInterestRateItem>> marginInterestRateHistory({
+    required String asset,
+    int? vipLevel, // Default: user's vip level
+    int? startTime, // Default: 7 days ago
+    int? endTime, // Default: present. Maximum range: 1 months.
+  }) async {
+    final List data = await _api
+        .marginInterestRateHistory(asset: asset, vipLevel: vipLevel, startTime: startTime, endTime: endTime)
+        .then((r) => r.json);
+    return List<BnApiMarginInterestRateItem>.from(data.map((e) => BnApiMarginInterestRateItem(e)));
+  }
+
+  Future<List<BnApiMarginFeeItem>> marginFee({String? coin, int? vipLevel}) async {
+    final List data = await _api.marginFee(coin: coin, vipLevel: vipLevel).then((r) => r.json);
+    return List<BnApiMarginFeeItem>.from(data.map((e) => BnApiMarginFeeItem(e)));
+  }
+
+  Future<double> marginTransferMax({required String asset, String? isolatedSymbol}) async {
+    return await _api.marginTransferMax(asset: asset, isolatedSymbol: isolatedSymbol);
+  }
+
+  Future<BnApiMarginLevelInfo> marginGetLevelInfo() async {
+    return await _api.marginGetLevelInfo().then((r) => BnApiMarginLevelInfo(r.json));
+  }
+
+  // ========= Isolated Account/Trade Endpoints ===============
+  Future<List<BnApiIsolatedMarginTransfer>> isolatedTransferHistory({
+    required String symbol,
+    String? asset,
+    String? transFrom, // SPOT, ISOLATED_MARGIN
+    String? transTo, // SPOT, ISOLATED_MARGIN
+    int? startTime,
+    int? endTime,
+    int? current, // Current page, default 1
+    int? size, // Default 10, max 100
+    bool? archived, // Default: false. Set to true for archived data from 6 months ago
+  }) async {
+    final Map _data = await _api
+        .isolatedTransferHistory(
+            symbol: symbol,
+            asset: asset,
+            transFrom: transFrom,
+            transTo: transTo,
+            startTime: startTime,
+            endTime: endTime,
+            current: current,
+            size: size,
+            archived: archived)
+        .then((r) => r.json);
+    return List<BnApiIsolatedMarginTransfer>.from(_data['rows'].map((e) => BnApiIsolatedMarginTransfer(e)));
+  }
+
+  Future<BnApiIsolatedMarginAccountInfo> isolatedMarginAccount({List<String>? symbols}) async {
+    return await _api.isolatedMarginAccount(symbols: symbols).then((r) => BnApiIsolatedMarginAccountInfo(r.json));
+  }
+
+  Future<BnApiIsolatedMarginAccountLimit> isolatedMarginAccountLimit() async {
+    return await _api.isolatedMarginAccountLimit().then((r) => BnApiIsolatedMarginAccountLimit(r.json));
+  }
+
+  Future<List<BnApiIsolatedSymbol>> isolatedSymbols() async {
+    return await _api.isolatedSymbols().then((r) => List.from(r.json.map((e) => BnApiIsolatedSymbol(e))));
+  }
+
+  Future<BnApiIsolatedSymbol> isolatedSymbol({required String symbol}) async {
+    return await _api.isolatedSymbol(symbol: symbol).then((r) => BnApiIsolatedSymbol(r.json));
+  }
+
+  Future<List<BnApiIsolatedFeeItem>> isolatedFee({String? symbol, int? vipLevel}) async {
+    final List data = await _api.isolatedFee(symbol: symbol, vipLevel: vipLevel).then((r) => r.json);
+    return List<BnApiIsolatedFeeItem>.from(data.map((e) => BnApiIsolatedFeeItem(e)));
+  }
+
+  Future<List<BnApiIsolatedTierItem>> isolatedTier({required String symbol, int? tier}) async {
+    final List data = await _api.isolatedTier(symbol: symbol, tier: tier).then((r) => r.json);
+    return List<BnApiIsolatedTierItem>.from(data.map((e) => BnApiIsolatedTierItem(e)));
   }
 
   // print('Data: $data');
@@ -486,47 +569,4 @@ class BnSerializedApi {
   }
 
   Future<AvgPrice> getAvgPrice(String symbol) async => _api.getAvgPrice(symbol).then((r) => AvgPrice(r.json));
-
-  Future<BnApiMarginLevelInfo> marginGetLevelInfo() async {
-    return await _api.marginGetLevelInfo().then((r) => BnApiMarginLevelInfo(r.json));
-  }
-
-  Future<List<IsolatedMarginTransfer>> getIsolatedTransferHistory(
-    String symbol, {
-    String? asset,
-    String? transFrom, // SPOT, ISOLATED_MARGIN
-    String? transTo, // SPOT, ISOLATED_MARGIN
-    int? startTime,
-    int? endTime,
-    int? current, // Current page, default 1
-    int? size, // Default 10, max 100
-    bool? archived, // Default: false. Set to true for archived data from 6 months ago
-  }) async {
-    final Map _data = await _api
-        .getIsolatedTransferHistory(symbol,
-            asset: asset,
-            transFrom: transFrom,
-            transTo: transTo,
-            startTime: startTime,
-            endTime: endTime,
-            current: current,
-            size: size,
-            archived: archived)
-        .then((r) => r.json);
-    return List<IsolatedMarginTransfer>.from(_data['rows'].map((e) => IsolatedMarginTransfer(e)));
-  }
-
-  Future<IsolatedMarginAccountInfo> getIsolatedMarginAccount([String? symbols]) async {
-    return await _api.getIsolatedMarginAccount(symbols).then((r) => IsolatedMarginAccountInfo(r.json));
-  }
-
-  Future<List<IsolatedMarginSymbol>> getAllIsolatedMarginSymbols() async {
-    return await _api.getAllIsolatedMarginSymbols().then((r) => List.from(r.json.map((e) => IsolatedMarginSymbol(e))));
-  }
-
-  Future<List<IsolatedMarginFee>> getIsolatedMarginFee({String? symbol, int? vipLevel}) async {
-    return await _api
-        .getIsolatedMarginFee(symbol: symbol, vipLevel: vipLevel)
-        .then((r) => List.from(r.json.map((e) => IsolatedMarginFee(e))));
-  }
 }

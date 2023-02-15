@@ -598,6 +598,21 @@ class BnApiConvertingStableCoins {
 }
 
 // =================================================================================================================
+
+class BnApiBnbBurnSpotMargin {
+  final bool spotBNBBurn;
+  final bool interestBNBBurn;
+
+  BnApiBnbBurnSpotMargin(Map m)
+      : spotBNBBurn = m['spotBNBBurn'],
+        interestBNBBurn = m['interestBNBBurn'];
+
+  @override
+  String toString() {
+    return 'spot: $spotBNBBurn margin: $interestBNBBurn';
+  }
+}
+
 // =================================================================================================================
 // =================================================================================================================
 

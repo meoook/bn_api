@@ -3,7 +3,7 @@
 **_Binance Api on Dart language._**
 
 * web site: [github.com][git]
-* version: 0.1.14
+* version: 0.1.15
 * author: [meok][author]
 * dependencies: http, web_socket_channel, test
 
@@ -29,7 +29,7 @@ main() async {
 - [ ] Market Data
 - [ ] Websocket ?
 - [ ] Spot Account/Trade
-- [ ] Margin Account/Trade
+- [x] Margin Account/Trade
 - [ ] User Data Streams
 - [ ] Savings
 - [ ] Stacking

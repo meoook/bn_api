@@ -5,6 +5,7 @@
 |         |            | Comments                                               |
 |         |            | Not serialized data for compute                        |
 |         |            | Serialized client                                      |
+| 0.1.15  | 16.02.2023 | Isolated Margin Endpoints                              |
 | 0.1.14  | 15.02.2023 | Margin Endpoints                                       |
 | 0.1.13  | 06.02.2023 | Account Endpoints                                      |
 | 0.1.12  | 02.02.2023 | Account and General methods and objects (part2)        |

@@ -317,3 +317,49 @@ class BnApiCrossMarginAccountInfo {
 }
 
 // =================================================================================================================
+
+class BnApiMarginInterestRateItem {
+  final String asset;
+  final double dailyInterestRate;
+  final DateTime timestamp;
+  final int vipLevel;
+
+  BnApiMarginInterestRateItem(Map m)
+      : asset = m['asset'],
+        dailyInterestRate = double.parse(m['dailyInterestRate']),
+        timestamp = DateTime.fromMillisecondsSinceEpoch(m['timestamp']),
+        vipLevel = m['vipLevel'];
+
+  @override
+  String toString() {
+    return '$asset VIP: $vipLevel rate: $dailyInterestRate';
+  }
+}
+
+// =================================================================================================================
+
+class BnApiMarginFeeItem {
+  final String coin;
+  final int vipLevel;
+  final bool transferIn;
+  final bool borrowable;
+  final double dailyInterest;
+  final double yearlyInterest;
+  final double borrowLimit;
+  final List<String> marginablePairs;
+
+  BnApiMarginFeeItem(Map m)
+      : coin = m['coin'],
+        vipLevel = m['vipLevel'],
+        transferIn = m['transferIn'],
+        borrowable = m['borrowable'],
+        dailyInterest = double.parse(m['dailyInterest']),
+        yearlyInterest = double.parse(m['yearlyInterest']),
+        borrowLimit = double.parse(m['borrowLimit']),
+        marginablePairs = List.from(m['marginablePairs'].map((e) => '$e'));
+
+  @override
+  String toString() {
+    return '$coin VIP: $vipLevel rate: $dailyInterest';
+  }
+}

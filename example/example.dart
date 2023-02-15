@@ -108,12 +108,12 @@ main() async {
   //     quantity: 2,
   //     price: 5.5,
   //     sideEffectType: BnApiOrderSideEffect.margin);
-  // print('Created margin isolated order $marginCreateOrder');
+  // print('Margin Create Isolated Order $marginCreateOrder');
 
   // TODO: NOT TESTED
   // final marginCancelOrder =
   //     await _binance.marginCancelOrder(symbol: symbol, isIsolated: true, orderId: marginCreateOrder.orderId);
-  // print('Cancel margin isolated order $marginCancelOrder');
+  // print('Margin Cancel Isolated Order $marginCancelOrder');
 
   // TODO: NOT TESTED
   // final marginOrder2 = await _binance.marginCreateOrder(
@@ -125,16 +125,15 @@ main() async {
   //     quantity: 2,
   //     price: 5.5,
   //     sideEffectType: BnApiOrderSideEffect.margin);
-  // print('Created margin isolated order $marginOrder2');
+  // print('Margin Create Isolated Order $marginOrder2');
 
   // TODO: NOT TESTED
   // final marginGetOrder = await _binance.marginGetOrder(symbol: symbol, isIsolated: true, orderId: marginOrder2.orderId);
-  // print('Margin Account Order  $marginGetOrder');
+  // print('Margin Get Order  $marginGetOrder');
 
   // TODO: NOT TESTED
-  // final marginCancelOrders =
-  // await _binance.marginCancelOrders(symbol: symbol, isIsolated: true);
-  // print('Cancel margin isolated orders $marginCancelOrders');
+  // final marginCancelOrders = await _binance.marginCancelOrders(symbol: symbol, isIsolated: true);
+  // print('Margin Cancel Isolated Orders $marginCancelOrders');
 
   // TODO: NOT TESTED
   // final marginTransferWithSpotHistory = await _binance.marginTransferWithSpotHistory();
@@ -158,34 +157,59 @@ main() async {
   // final marginGetAllOrders = await _binance.marginGetAllOrders(symbol: 'OCEANUSDT', isIsolated: true);
   // print('Margin All Orders $marginGetAllOrders');
 
-  // final marginGetAllOrders = await _binance.marginGetAllOrders(symbol: 'OCEANUSDT', isIsolated: true);
-  // print('Margin All Orders $marginGetAllOrders');
-
   // TODO: NOT TESTED
-  // final _marginTrades = await _binance.marginGetTrades(symbol: 'OCEANUSDT', isIsolated: true);
-  // print('Margin Trades $_marginTrades');
+  // final marginGetTrades = await _binance.marginGetTrades(symbol: 'OCEANUSDT', isIsolated: true);
+  // print('Margin Trades $marginGetTrades');
 
-  final marginGetLevelInfo = await _binance.marginGetLevelInfo();
-  print('Margin Personal Level Info $marginGetLevelInfo');
+  // final marginGetLevelInfo = await _binance.marginGetLevelInfo();
+  // print('Margin Personal Level Info $marginGetLevelInfo');
+
+  // final marginTransferMax = await _binance.marginTransferMax(asset: 'USDT', isolatedSymbol: 'OCEANUSDT');
+  // print('Margin TransferMax $marginTransferMax');
+
+  // final isolatedTransferHistory = await _binance.isolatedTransferHistory(symbol: 'OCEANUSDT');
+  // print('Isolated Margin Transfer History $isolatedTransferHistory');
+
+  // final isolatedMarginAccount = await _binance.isolatedMarginAccount(symbols: ['COMPUSDT', 'OCEANUSDT']);
+  // print('Isolated Margin Account Info - $isolatedMarginAccount');
+  // print('Isolated Margin Account Symbol ${isolatedMarginAccount.getSymbolInfo('OCEANUSDT')}');
+
+  // final isolatedMarginAccountLimit = await _binance.isolatedMarginAccountLimit();
+  // print('Isolated Margin Account Limit - $isolatedMarginAccountLimit');
+
+  // final accountGetBnbBurnSpotMargin = await _binance.accountGetBnbBurnSpotMargin();
+  // print('Bnb Burn Spot Margin - $accountGetBnbBurnSpotMargin');
+
+  // final isolatedSymbol = await _binance.isolatedSymbol(symbol: symbol);
+  // print('Isolated Margin Symbol $isolatedSymbol');
+
+  // final isolatedSymbols = await _binance.isolatedSymbols();
+  // print('All Isolated Margin Symbols $isolatedSymbols');
+
+  // final marginInterestRateHistory = await _binance.marginInterestRateHistory(asset: asset, vipLevel: 2);
+  // print('Margin Interest Rate History $marginInterestRateHistory');
+
+  // final marginFee = await _binance.marginFee(coin: asset, vipLevel: 2);
+  // print('Margin Fee $marginFee');
+
+  // final isolatedFee = await _binance.isolatedFee();
+  // print('Isolated Margin Fee $isolatedFee');
+
+  // final isolatedTier = await _binance.isolatedTier(symbol: symbol);
+  // print('Isolated Margin Tier $isolatedTier');
+
+  // ==========================================================================================
 
   // final _klines = await _binance.getKLines(symbol, BnApiTimeFrame.min5, limit: 30);
   // print('KLINESs $_klines');
   // final _avgPrice = await _binance.getAvgPrice(symbol);
   // print('AvgPrice $_avgPrice');
-  // Get Isolated Margin Transfer History
-  // final _getIsolatedTransferHistory = await _binance.getIsolatedTransferHistory(symbol, asset: asset);
-  // print('Isolated Margin Transfer History $_getIsolatedTransferHistory');
-  // final _isolatedMarginAccountInfo = await _binance.getIsolatedMarginAccount(symbol);
-  // print('Isolated Margin Account Info no symbol $_isolatedMarginAccountInfo');
-  // print('Isolated Margin Account Info ${_isolatedMarginAccountInfo.getAssetInfo(symbol)}');
-  // final _allIsolatedMarginSymbols = await _binance.getAllIsolatedMarginSymbols();
-  // print('getAllIsolatedMarginSymbols $_allIsolatedMarginSymbols');
-  // final _getIsolatedMarginFee = await _binance.getIsolatedMarginFee();
-  // print('getIsolatedMarginFee $_getIsolatedMarginFee');
 
   // final List<SymbolProduct> _products = await _binance.productList();
   // print('Products ${_products}');
   // final _info = await _binance.getExchangeInfo();
   // print('Info ${_info}');
   // print('XXX ${_info.getSymbolInfo('ETHBTC')}');
+
+  // ==========================================================================================
 }

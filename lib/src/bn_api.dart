@@ -387,10 +387,27 @@ class BnApi extends BaseClient {
         .then((r) => true);
   }
 
+  //  TODO: not tested
+  /// Toggle BNB burn on spot trade and margin interest
+  /// [spotBNBBurn] and [interestBNBBurn] should be sent at least one
+  /// [spotBNBBurn] Determines whether to use BNB to pay for trading fees on SPOT
+  /// [interestBNBBurn] Determines whether to use BNB to pay for margin loan's interest
+  Future<ApiResponse> accountToggleBnbBurnSpotMargin({bool? spotBNBBurn, bool? interestBNBBurn}) async {
+    final params = {
+      if (spotBNBBurn != null) 'spotBNBBurn': spotBNBBurn,
+      if (interestBNBBurn != null) 'interestBNBBurn': interestBNBBurn,
+    };
+    return await requestMarginApi(HttpMethod.post, 'bnbBurn', signed: true, params: params);
+  }
+
+  /// Get BNB burn status
+  /// https://binance-docs.github.io/apidocs/spot/en/#get-bnb-burn-status-user_data
+  Future<ApiResponse> accountGetBnbBurnSpotMargin() async {
+    return await requestMarginApi(HttpMethod.get, 'bnbBurn', signed: true);
+  }
+
   // =================================================================================================================
   // Sub-Account Endpoints
-  // =================================================================================================================
-  // =================================================================================================================
   // =================================================================================================================
 
   // Exchange Endpoints
@@ -1087,7 +1104,7 @@ class BnApi extends BaseClient {
   /// Get margin account's all order (60 times/min)
   /// If [orderId] is set, it will get orders >= that [orderId]. Otherwise most recent orders are returned
   /// https://binance-docs.github.io/apidocs/spot/en/#query-margin-account-39-s-all-orders-user_data
-  Future marginGetAllOrders({
+  Future<ApiResponse> marginGetAllOrders({
     required String symbol,
     bool? isIsolated, // isolated margin or not, default false
     int? orderId,
@@ -1107,19 +1124,19 @@ class BnApi extends BaseClient {
   }
 
   /// Margin account's create OCO
-  Future create_margin_oco_order() async {
+  Future<ApiResponse> create_margin_oco_order() async {
     final Map<String, dynamic> _params = {};
     return await requestMarginApi(HttpMethod.post, 'margin/order/oco', signed: true, params: _params);
   }
 
   /// Margin account's cancel OCO
-  Future cancel_margin_oco_order() async {
+  Future<ApiResponse> cancel_margin_oco_order() async {
     final Map<String, dynamic> _params = {};
     return await requestMarginApi(HttpMethod.delete, 'margin/orderList', signed: true, params: _params);
   }
 
   /// Get margin account's OCO
-  Future get_margin_oco_order() async {
+  Future<ApiResponse> get_margin_oco_order() async {
     final Map<String, dynamic> _params = {};
     return await requestMarginApi(HttpMethod.get, 'margin/orderList', signed: true, params: _params);
   }
@@ -1160,85 +1177,124 @@ class BnApi extends BaseClient {
     return await requestMarginApi(HttpMethod.get, 'margin/myTrades', signed: true, params: params);
   }
 
-  Future get_max_margin_loan({required String asset, String? isolatedSymbol}) async {
+  Future<ApiResponse> get_max_margin_loan({required String asset, String? isolatedSymbol}) async {
     final params = {'asset': asset, if (isolatedSymbol != null) 'isolatedSymbol': isolatedSymbol};
     return await requestMarginApi(HttpMethod.get, 'margin/maxBorrowable', signed: true, params: params);
   }
 
-  Future get_max_margin_transfer({required String asset, String? isolatedSymbol}) async {
+  /// Get max transfer-out amount
+  /// If [isolatedSymbol] is not sent, crossed margin data will be sent
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-max-transfer-out-amount-user_data
+  Future<double> marginTransferMax({required String asset, String? isolatedSymbol}) async {
     final params = {'asset': asset, if (isolatedSymbol != null) 'isolatedSymbol': isolatedSymbol};
-    return await requestMarginApi(HttpMethod.get, 'margin/maxTransferable', signed: true, params: params);
+    return await requestMarginApi(HttpMethod.get, 'margin/maxTransferable', signed: true, params: params)
+        .then((r) => double.parse(r.json['amount']));
   }
 
   /// Get personal margin level information
   /// https://binance-docs.github.io/apidocs/spot/en/#get-summary-of-margin-account-user_data
-  Future marginGetLevelInfo() async => await requestMarginApi(HttpMethod.get, 'margin/tradeCoeff', signed: true);
-
-  // TODO: FROM HERE
-
-  /// Query isolated margin account info
-  /// If [symbols] is not sent, all isolated assets will be returned
-  /// If [symbols] is sent, only the isolated assets of the sent symbols will be returned
-  /// Max 5 [symbols] can be sent; separated by ",". e.g. "BTCUSDT,BNBUSDT,ADAUSDT"
-  /// https://binance-docs.github.io/apidocs/spot/en/#query-isolated-margin-account-info-user_data
-  Future getIsolatedMarginAccount([String? symbols]) async {
-    final Map<String, dynamic> _params = {if (symbols != null) 'symbols': symbols};
-    return await requestMarginApi(HttpMethod.get, 'margin/isolated/account', signed: true, params: _params);
+  Future<ApiResponse> marginGetLevelInfo() async {
+    return await requestMarginApi(HttpMethod.get, 'margin/tradeCoeff', signed: true);
   }
 
-  Future enable_isolated_margin_account() async {
-    final Map<String, dynamic> _params = {};
-    return await requestMarginApi(HttpMethod.post, 'margin/isolated/account', signed: true, params: _params);
+  /// Get margin interest rate history
+  Future<ApiResponse> marginInterestRateHistory({
+    required String asset,
+    int? vipLevel, // Default: user's vip level
+    int? startTime, // Default: 7 days ago
+    int? endTime, // Default: present. Maximum range: 1 months.
+  }) async {
+    final params = {
+      'asset': asset,
+      if (vipLevel != null) 'vipLevel': vipLevel,
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+    };
+    return await requestMarginApi(HttpMethod.get, 'margin/interestRateHistory', signed: true, params: params);
   }
 
-  Future disable_isolated_margin_account() async {
-    final Map<String, dynamic> _params = {};
-    return await requestMarginApi(HttpMethod.delete, 'margin/isolated/account', signed: true, params: _params);
-  }
-
-  /// Get isolated margin fee data collection with any vip level or user's current specific data
-  /// https://binance-docs.github.io/apidocs/spot/en/#query-isolated-margin-fee-data-user_data
-  Future getIsolatedMarginFee({String? symbol, int? vipLevel}) async {
-    final Map<String, dynamic> _params = {
-      if (symbol != null) 'symbols': symbol,
+  /// Get cross margin fee data
+  /// User's current specific margin data will be returned if [vipLevel] is omitted
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-cross-margin-fee-data-user_data
+  Future<ApiResponse> marginFee({String? coin, int? vipLevel}) async {
+    final params = {
+      if (coin != null) 'coin': coin,
       if (vipLevel != null) 'vipLevel': vipLevel,
     };
-    return await requestMarginApi(HttpMethod.get, 'margin/isolatedMarginData', signed: true, params: _params);
+    return await requestMarginApi(HttpMethod.get, 'margin/crossMarginData', signed: true, params: params);
   }
 
-  Future create_isolated_margin_account() async {
-    final Map<String, dynamic> _params = {};
-    return await requestMarginApi(HttpMethod.post, 'margin/isolated/create', signed: true, params: _params);
+  /// Get current margin order count usage
+  /// Displays the user's current margin order count usage for all intervals
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-current-margin-order-count-usage-trade
+  Future<ApiResponse> margin_order_count_usage({String? symbol, bool? isIsolated}) async {
+    final params = {
+      if (symbol != null) 'symbol': symbol,
+      if (isIsolated != null) 'isIsolated': isIsolated,
+    };
+    return await requestMarginApi(HttpMethod.get, 'margin/rateLimit/order', signed: true, params: params);
   }
 
-  Future get_isolated_margin_symbol() async {
-    final Map<String, dynamic> _params = {};
-    return await requestMarginApi(HttpMethod.get, 'margin/isolated/pair', signed: true, params: _params);
+  /// Margin dustlog
+  /// Query the historical information of user's margin account small-value asset conversion BNB
+  /// https://binance-docs.github.io/apidocs/spot/en/#margin-dustlog-user_data
+  Future<ApiResponse> margin_dust_log({int? startTime, int? endTime}) async {
+    final params = {
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+    };
+    return await requestMarginApi(HttpMethod.get, 'margin/dribblet', signed: true, params: params);
   }
 
-  /// Get All Isolated Margin Symbol
-  /// https://binance-docs.github.io/apidocs/spot/en/#get-all-isolated-margin-symbol-user_data
-  Future getAllIsolatedMarginSymbols() async {
-    return await requestMarginApi(HttpMethod.get, 'margin/isolated/allPairs', signed: true);
+  /// Cross margin collateral ratio
+  /// https://binance-docs.github.io/apidocs/spot/en/#cross-margin-collateral-ratio-market_data
+  Future<ApiResponse> margin_collateral_ratio() async {
+    return await requestMarginApi(HttpMethod.get, 'margin/crossMarginCollateralRatio', signed: true);
   }
 
-  Future toggle_bnb_burn_spot_margin() async {
-    final Map<String, dynamic> _params = {};
-    return await requestMarginApi(HttpMethod.post, 'bnbBurn', signed: true, params: _params);
+  /// Get small liability exchange coin list
+  /// https://binance-docs.github.io/apidocs/spot/en/#get-small-liability-exchange-coin-list-user_data
+  Future<ApiResponse> margin_liability_exchange_coin_list() async {
+    return await requestMarginApi(HttpMethod.get, 'margin/exchange-small-liability', signed: true);
   }
 
-  Future get_bnb_burn_spot_margin() async {
-    final Map<String, dynamic> _params = {};
-    return await requestMarginApi(HttpMethod.get, 'bnbBurn', signed: true, params: _params);
+  /// Small liability exchange
+  /// Only convert once within 6 hours
+  /// Only liability valuation less than 10 BUSD are supported
+  /// The maximum number of [assetNames] is 10
+  /// https://binance-docs.github.io/apidocs/spot/en/#small-liability-exchange-margin
+  Future<ApiResponse> margin_liability_exchange({required List<String> assetNames}) async {
+    final params = {'assetNames': assetNames.join(',')};
+    return await requestMarginApi(HttpMethod.post, 'margin/exchange-small-liability', signed: true, params: params);
   }
 
-  /// Get Isolated Margin Transfer History
-  /// https://binance-docs.github.io/apidocs/spot/en/#get-isolated-margin-transfer-history-user_data
-  /// The max interval between [startTime] and [endTime] is 30 days.
+  Future<ApiResponse> margin_liability_exchange_history({
+    required int current, // Currently querying page. Start from 1. Default:1
+    required int size, // Default:10, Max:100
+    int? startTime, // Default: 30 days from current timestamp
+    int? endTime, // Default: present timestamp
+  }) async {
+    final params = {
+      'current': current,
+      'size': size,
+      if (startTime != null) 'startTime': startTime,
+      if (endTime != null) 'endTime': endTime,
+    };
+    return await requestMarginApi(HttpMethod.get, 'margin/exchange-small-liability-history',
+        signed: true, params: params);
+  }
+
+  // =================================================================================================================
+  // Isolated Trading Endpoints
+  // =================================================================================================================
+
+  /// Get isolated margin transfer history
+  /// The max interval between [startTime] and [endTime] is 30 days
   /// If [startTime] and [endTime] not sent, return records of the last 7 days by default
   /// Set [archived] to true to query data from 6 months ago
-  Future getIsolatedTransferHistory(
-    String symbol, {
+  /// https://binance-docs.github.io/apidocs/spot/en/#get-isolated-margin-transfer-history-user_data
+  Future<ApiResponse> isolatedTransferHistory({
+    required String symbol,
     String? asset,
     String? transFrom, // SPOT, ISOLATED_MARGIN
     String? transTo, // SPOT, ISOLATED_MARGIN
@@ -1248,7 +1304,7 @@ class BnApi extends BaseClient {
     int? size, // Default 10, max 100
     bool? archived, // Default: false. Set to true for archived data from 6 months ago
   }) async {
-    final Map<String, dynamic> _params = {
+    final params = {
       'symbol': symbol,
       if (asset != null) 'asset': asset,
       if (transFrom != null) 'transFrom': transFrom,
@@ -1259,23 +1315,94 @@ class BnApi extends BaseClient {
       if (size != null) 'size': size,
       if (archived != null) 'archived': archived,
     };
-    return await requestMarginApi(HttpMethod.get, 'margin/isolated/transfer', signed: true, params: _params);
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/transfer', signed: true, params: params);
   }
 
-  Future transfer_isolated_margin_to_spot() async {
-    final Map<String, dynamic> _params = {'transFrom': 'ISOLATED_MARGIN', 'transTo': 'SPOT'};
-    return await requestMarginApi(HttpMethod.post, 'margin/isolated/transfer', signed: true, params: _params);
+  /// Isolated margin account transfer
+  /// https://binance-docs.github.io/apidocs/spot/en/#isolated-margin-account-transfer-margin
+  Future<int> isolatedTransferWithSpot({
+    required String asset,
+    required String symbol,
+    required String transFrom, // SPOT, ISOLATED_MARGIN
+    required String transTo, // ISOLATED_MARGIN, SPOT
+    required double amount,
+  }) async {
+    final params = {
+      'asset': asset,
+      'symbol': symbol,
+      'transFrom': transFrom,
+      'transTo': transTo,
+      'amount': amount,
+    };
+    return await requestMarginApi(HttpMethod.post, 'margin/isolated/transfer', signed: true, params: params)
+        .then((r) => r.json['tranId']);
   }
 
-  Future transfer_spot_to_isolated_margin() async {
-    final Map<String, dynamic> _params = {'transFrom': 'SPOT', 'transTo': 'ISOLATED_MARGIN'};
-    return await requestMarginApi(HttpMethod.post, 'margin/isolated/transfer', signed: true, params: _params);
+  /// Get isolated margin account info
+  /// If [symbols] is not sent, all isolated assets will be returned
+  /// If [symbols] is sent, only the isolated assets of the sent symbols will be returned
+  /// Max 5 [symbols] can be sent; separated by ",". e.g. "BTCUSDT,BNBUSDT,ADAUSDT"
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-isolated-margin-account-info-user_data
+  Future<ApiResponse> isolatedMarginAccount({List<String>? symbols}) async {
+    final params = {if (symbols != null) 'symbols': symbols.join(',')};
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/account', signed: true, params: params);
   }
 
-  Future get_cross_margin_data() async {
-    final Map<String, dynamic> _params = {};
-    return await requestMarginApi(HttpMethod.get, 'margin/crossMarginData', signed: true, params: _params);
+  /// Enable isolated margin account for a specific [symbol]
+  /// Only supports activation of previously disabled accounts
+  /// https://binance-docs.github.io/apidocs/spot/en/#enable-isolated-margin-account-trade
+  Future<bool> isolatedMarginAccountEnable({required String symbol}) async {
+    final params = {'symbol': symbol};
+    return await requestMarginApi(HttpMethod.post, 'margin/isolated/account', signed: true, params: params)
+        .then((r) => r.json['success']);
   }
+
+  /// Disable isolated margin account for a specific [symbol]
+  /// Each trading pair can only be deactivated once every 24 hours
+  /// https://binance-docs.github.io/apidocs/spot/en/#disable-isolated-margin-account-trade
+  Future<bool> isolatedMarginAccountDisable({required String symbol}) async {
+    final params = {'symbol': symbol};
+    return await requestMarginApi(HttpMethod.delete, 'margin/isolated/account', signed: true, params: params)
+        .then((r) => r.json['success']);
+  }
+
+  /// Get enabled isolated margin account limit
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-enabled-isolated-margin-account-limit-user_data
+  Future<ApiResponse> isolatedMarginAccountLimit() async {
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/accountLimit', signed: true);
+  }
+
+  /// Get isolated margin symbol
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-isolated-margin-symbol-user_data
+  Future<ApiResponse> isolatedSymbol({required String symbol}) async {
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/pair', signed: true, params: {'symbol': symbol});
+  }
+
+  /// Get all isolated margin symbol
+  /// https://binance-docs.github.io/apidocs/spot/en/#get-all-isolated-margin-symbol-user_data
+  Future<ApiResponse> isolatedSymbols() async {
+    return await requestMarginApi(HttpMethod.get, 'margin/isolated/allPairs', signed: true);
+  }
+
+  /// Get isolated margin fee data
+  /// User's current specific margin data will be returned if [vipLevel] is omitted
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-isolated-margin-fee-data-user_data
+  Future<ApiResponse> isolatedFee({String? symbol, int? vipLevel}) async {
+    final params = {
+      if (symbol != null) 'symbol': symbol,
+      if (vipLevel != null) 'vipLevel': vipLevel,
+    };
+    return await requestMarginApi(HttpMethod.get, 'margin/isolatedMarginData', signed: true, params: params);
+  }
+
+  /// Get isolated margin tier data
+  /// https://binance-docs.github.io/apidocs/spot/en/#query-isolated-margin-tier-data-user_data
+  Future<ApiResponse> isolatedTier({required String symbol, int? tier}) async {
+    final params = {'symbol': symbol, if (tier != null) 'tier': tier};
+    return await requestMarginApi(HttpMethod.get, 'margin/isolatedMarginTier', signed: true, params: params);
+  }
+
+  // TODO: FROM HERE !!!
 
   // Cross-margin
 
