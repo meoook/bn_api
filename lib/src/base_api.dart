@@ -30,11 +30,11 @@ class BaseClient {
 
   /// Dictionary of [requestParams] to use for all calls.
   /// Use [testnet] environment - only available for vanilla options at the moment.
-  BaseClient({String? apiKey, String? apiSecret, testnet = false, debug = false, Map<String, String>? requestParams})
+  BaseClient({String? apiKey, String? apiSecret, bool? testnet, bool? debug, Map<String, String>? requestParams})
       : _apiKey = apiKey,
         _apiSecret = apiSecret,
-        _testnet = testnet,
-        _debug = debug,
+        _testnet = testnet ?? false,
+        _debug = debug ?? false,
         _params = requestParams;
 
   Map<String, String> get _headers {

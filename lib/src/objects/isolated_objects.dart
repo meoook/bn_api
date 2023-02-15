@@ -89,7 +89,6 @@ class IsolatedMarginAsset {
 }
 
 class IsolatedMarginAccountInfo {
-  /// IsolatedMarginAccountInfo
   final double? totalAssetOfBtc;
   final double? totalLiabilityOfBtc;
   final double? totalNetAssetOfBtc;

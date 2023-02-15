@@ -3,7 +3,7 @@
 **_Binance Api on Dart language._**
 
 * web site: [github.com][git]
-* version: 0.1.13
+* version: 0.1.14
 * author: [meok][author]
 * dependencies: http, web_socket_channel, test
 

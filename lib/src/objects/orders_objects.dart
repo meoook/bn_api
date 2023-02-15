@@ -1,5 +1,4 @@
-class MarginOrder {
-  /// Margin Order: GET
+class BnApiMarginOrderGet {
   final String symbol;
   final int orderId;
   final String clientOrderId;
@@ -16,9 +15,10 @@ class MarginOrder {
   final DateTime time;
   final DateTime updateTime;
   final bool isWorking;
+  final int accountId;
   final bool isIsolated;
 
-  MarginOrder(Map m)
+  BnApiMarginOrderGet(Map m)
       : symbol = m['symbol'],
         orderId = m['orderId'],
         clientOrderId = m['clientOrderId'],
@@ -35,11 +35,12 @@ class MarginOrder {
         time = DateTime.fromMillisecondsSinceEpoch(m['time']),
         updateTime = DateTime.fromMillisecondsSinceEpoch(m['updateTime']),
         isWorking = m['isWorking'],
+        accountId = m['accountId'],
         isIsolated = m['isIsolated'];
 
   @override
   String toString() {
-    return 'margin $symbol $type $status qty: $origQty price: $price';
+    return '$symbol $type $status qty: $origQty price: $price';
   }
 }
 
@@ -80,20 +81,27 @@ class MarginCancelOrder {
   }
 }
 
-class MarginOrderFill {
+// =================================================================================================================
+
+class BnApiMarginOrderFill {
   final double price;
   final double qty;
   final double commission;
   final String commissionAsset;
-  MarginOrderFill(Map m)
+
+  BnApiMarginOrderFill(Map m)
       : price = m['price'],
         qty = m['qty'],
         commission = m['commission'],
         commissionAsset = m['commissionAsset'];
+
+  @override
+  String toString() {
+    return ' $qty $price commission $commission $commissionAsset';
+  }
 }
 
-class MarginCreatedOrder {
-  /// Margin Order: CREATE
+class BnApiMarginOrder {
   final String symbol;
   final int orderId;
   final String clientOrderId;
@@ -108,12 +116,9 @@ class MarginCreatedOrder {
   final bool isIsolated;
   final String side; // BUY, SELL
 
-  late double? marginBuyBorrowAmount; // will not return if no margin trade happens
-  late String? marginBuyBorrowAsset; // will not return if no margin trade happens
+  final List<BnApiMarginOrderFill>? fills;
 
-  final List<MarginOrderFill>? fills;
-
-  MarginCreatedOrder(Map m)
+  BnApiMarginOrder(Map m)
       : symbol = m['symbol'],
         orderId = m['orderId'],
         clientOrderId = m['clientOrderId'],
@@ -125,15 +130,62 @@ class MarginCreatedOrder {
         status = m['status'],
         timeInForce = m['timeInForce'],
         type = m['type'],
-        isIsolated = m['isIsolated'],
         side = m['side'],
-        fills = (m.containsKey('fills')) ? m['fills'].map((e) => MarginOrderFill(e)) : null {
-    if (m.containsKey('marginBuyBorrowAmount')) marginBuyBorrowAmount = double.parse(m['marginBuyBorrowAmount']);
-    if (m.containsKey('marginBuyBorrowAsset')) marginBuyBorrowAsset = m['marginBuyBorrowAsset'];
-  }
+        marginBuyBorrowAmount = m['marginBuyBorrowAmount'] == null ? null : double.parse(m['marginBuyBorrowAmount']),
+        marginBuyBorrowAsset = m['marginBuyBorrowAsset'],
+        fills = m['fills'] == null ? null : m['fills'].map((e) => BnApiMarginOrderFill(e));
 
   @override
   String toString() {
-    return 'margin $symbol $type $status qty: $origQty price: $price';
+    return '$symbol $type $status qty: $origQty price: $price';
   }
 }
+
+class BnApiMarginCutOrder {
+  final String symbol;
+  final int orderId;
+  final int clientOrderId;
+
+  BnApiMarginCutOrder(Map m)
+      : symbol = m['symbol'],
+        orderId = m['orderId'],
+        clientOrderId = m['clientOrderId'];
+
+  @override
+  String toString() {
+    return '$symbol';
+  }
+}
+
+class BnApiMarginListOrder {
+  final int orderListId;
+  final String symbol;
+  final String contingencyType;
+  final String listStatusType;
+  final String listOrderStatus;
+  final String listClientOrderId;
+  final DateTime transactionTime;
+  final bool isIsolated;
+
+  final List<BnApiMarginCutOrder> orders;
+  final List<BnApiMarginOrder> orderReports;
+
+  BnApiMarginListOrder(Map m)
+      : orderListId = m['orderListId'],
+        symbol = m['symbol'],
+        contingencyType = m['contingencyType'],
+        listStatusType = m['listStatusType'],
+        listOrderStatus = m['listOrderStatus'],
+        listClientOrderId = m['listClientOrderId'],
+        transactionTime = DateTime.fromMillisecondsSinceEpoch(m['transactionTime']),
+        isIsolated = m['isIsolated'],
+        orders = m['orders'] == null ? null : m['orders'].map((e) => BnApiMarginCutOrder(e)),
+        orderReports = m['orderReports'] == null ? null : m['orderReports'].map((e) => BnApiMarginOrder(e));
+
+  @override
+  String toString() {
+    return '$symbol';
+  }
+}
+
+// =================================================================================================================

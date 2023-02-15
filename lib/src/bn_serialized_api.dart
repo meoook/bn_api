@@ -4,8 +4,8 @@ import 'objects.dart';
 class BnSerializedApi {
   final BnApi _api;
 
-  BnSerializedApi({String? apiKey, String? apiSecret, bool debug = false})
-      : _api = BnApi(apiKey: apiKey, apiSecret: apiSecret, debug: debug);
+  BnSerializedApi({String? apiKey, String? apiSecret, bool debug = false, bool? testnet = false})
+      : _api = BnApi(apiKey: apiKey, apiSecret: apiSecret, debug: debug, testnet: testnet);
 
   // ========= General Endpoints ===============
   Future<BnApiSystemStatus> serverGetStatus() async {
@@ -216,6 +216,250 @@ class BnSerializedApi {
     return await _api.accountConvertStableCoins(coin: coin, enable: enable);
   }
 
+  // ========= Margin Account/Trade Endpoints ===============
+  Future<List<BnApiMarginBorrowItem>> marginAccountBorrowDetails({
+    required String asset,
+    String? isolatedSymbol, // isolated symbol
+    int? txId, // the tranId in [marginAccountBorrow]
+    int? startTime,
+    int? endTime,
+    int? current, // Currently querying page. Start from 1. Default:1
+    int? size, // Default:10 Max:100
+    bool? archived,
+  }) async {
+    final Map data = await _api
+        .marginAccountBorrowDetails(
+            asset: asset,
+            isolatedSymbol: isolatedSymbol,
+            txId: txId,
+            startTime: startTime,
+            endTime: endTime,
+            current: current,
+            size: size,
+            archived: archived)
+        .then((r) => r.json);
+    return List<BnApiMarginBorrowItem>.from(data['rows'].map((e) => BnApiMarginBorrowItem(e)));
+  }
+
+  Future<List<BnApiMarginRepayItem>> marginAccountRepayDetails({
+    required String asset,
+    String? isolatedSymbol, // isolated symbol
+    int? txId, // the tranId in [marginAccountBorrow]
+    int? startTime,
+    int? endTime,
+    int? current, // Currently querying page. Start from 1. Default:1
+    int? size, // Default:10 Max:100
+    bool? archived,
+  }) async {
+    final Map data = await _api
+        .marginAccountRepayDetails(
+            asset: asset,
+            isolatedSymbol: isolatedSymbol,
+            txId: txId,
+            startTime: startTime,
+            endTime: endTime,
+            current: current,
+            size: size,
+            archived: archived)
+        .then((r) => r.json);
+    return List<BnApiMarginRepayItem>.from(data['rows'].map((e) => BnApiMarginRepayItem(e)));
+  }
+
+  Future<BnApiMarginAsset> marginAsset({required String asset}) async =>
+      await _api.marginAsset(asset: asset).then((r) => BnApiMarginAsset(r.json));
+
+  Future<List<BnApiMarginAsset>> marginAllAsset() async {
+    final List data = await _api.marginAllAsset().then((r) => r.json);
+    return List<BnApiMarginAsset>.from(data.map((e) => BnApiMarginAsset(e)));
+  }
+
+  Future<BnApiMarginSymbol> marginSymbol({required String symbol}) async =>
+      await _api.marginSymbol(symbol: symbol).then((r) => BnApiMarginSymbol(r.json));
+
+  Future<List<BnApiMarginSymbol>> marginAllSymbol() async {
+    final List data = await _api.marginAllSymbol().then((r) => r.json);
+    return List<BnApiMarginSymbol>.from(data.map((e) => BnApiMarginSymbol(e)));
+  }
+
+  Future<BnApiMarginPriceIndex> marginPriceIndex({required String symbol}) async =>
+      await _api.marginPriceIndex(symbol: symbol).then((r) => BnApiMarginPriceIndex(r.json));
+
+  Future<BnApiMarginOrder> marginCreateOrder({
+    required String symbol,
+    required String side, // BnApiOrderSide: BUY,SELL
+    required String type,
+    bool? isIsolated, // isolated margin or not, default false
+    String? timeInForce, // BnApiTimeInForce: GTC,IOC,FOK
+    double? quantity,
+    double? quoteOrderQty,
+    double? price,
+    double? stopPrice, // Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders
+    String? newClientOrderId, // A unique id among open orders. Automatically generated if not sent
+    double? icebergQty, // Used with LIMIT, STOP_LOSS_LIMIT, and TAKE_PROFIT_LIMIT to create an iceberg order
+    String? newOrderRespType, // BnApiOrderRespType: ACK, RESULT, FULL
+    String? sideEffectType, // BnApiOrderSideEffect: NO_SIDE_EFFECT(default), MARGIN_BUY, AUTO_REPAY
+  }) async {
+    final Map data = await _api
+        .marginCreateOrder(
+          symbol: symbol,
+          side: side,
+          type: type,
+          isIsolated: isIsolated,
+          timeInForce: timeInForce,
+          quantity: quantity,
+          quoteOrderQty: quoteOrderQty,
+          price: price,
+          stopPrice: stopPrice,
+          newClientOrderId: newClientOrderId,
+          icebergQty: icebergQty,
+          newOrderRespType: newOrderRespType,
+          sideEffectType: sideEffectType,
+        )
+        .then((r) => r.json);
+    return BnApiMarginOrder(data);
+  }
+
+  Future<BnApiMarginOrder> marginCancelOrder({
+    required String symbol,
+    bool? isIsolated, // isolated margin or not, default false
+    int? orderId,
+    String? origClientOrderId,
+    String? newClientOrderId, // Used to uniquely identify this cancel. Automatically generated by default
+  }) async {
+    final Map data = await _api
+        .marginCancelOrder(
+            symbol: symbol,
+            isIsolated: isIsolated,
+            orderId: orderId,
+            origClientOrderId: origClientOrderId,
+            newClientOrderId: newClientOrderId)
+        .then((r) => r.json);
+    return BnApiMarginOrder(data);
+  }
+
+  Future<List<BnApiMarginOrder>> marginCancelOrders({required String symbol, bool? isIsolated}) async {
+    final List data = await _api.marginCancelOrders(symbol: symbol, isIsolated: isIsolated).then((r) => r.json);
+    return List<BnApiMarginOrder>.from(data.map((e) => BnApiMarginOrder(e)));
+  }
+
+  Future<List<BnApiMarginTransferItem>> marginTransferWithSpotHistory({
+    String? asset,
+    String? type, // Transfer Type: ROLL_IN, ROLL_OUT
+    int? startTime,
+    int? endTime,
+    int? current, // Currently querying page. Start from 1. Default:1
+    int? size, // Default:10 Max:100
+    bool? archived, // Default: false. Set to true for archived data from 6 months ago
+  }) async {
+    final Map data = await _api
+        .marginTransferWithSpotHistory(
+            asset: asset,
+            type: type,
+            startTime: startTime,
+            endTime: endTime,
+            current: current,
+            size: size,
+            archived: archived)
+        .then((r) => r.json);
+    return List<BnApiMarginTransferItem>.from(data['rows'].map((e) => BnApiMarginTransferItem(e)));
+  }
+
+  Future<List<BnApiMarginInterestHistoryItem>> marginInterestHistory({
+    String? asset,
+    String? isolatedSymbol, // isolated symbol
+    int? startTime,
+    int? endTime,
+    int? current, // Currently querying page. Start from 1. Default:1
+    int? size, // Default:10 Max:100
+    bool? archived, // Default: false. Set to true for archived data from 6 months ago
+  }) async {
+    final Map data = await _api
+        .marginInterestHistory(
+            asset: asset,
+            isolatedSymbol: isolatedSymbol,
+            startTime: startTime,
+            endTime: endTime,
+            current: current,
+            size: size,
+            archived: archived)
+        .then((r) => r.json);
+    return List<BnApiMarginInterestHistoryItem>.from(data['rows'].map((e) => BnApiMarginInterestHistoryItem(e)));
+  }
+
+  Future<List<BnApiMarginForceLiquidationItem>> marginForceLiquidationRec({
+    String? isolatedSymbol, // isolated symbol
+    int? startTime,
+    int? endTime,
+    int? current, // Currently querying page. Start from 1. Default:1
+    int? size, // Default:10 Max:100
+  }) async {
+    final Map data = await _api
+        .marginForceLiquidationRec(
+            isolatedSymbol: isolatedSymbol, startTime: startTime, endTime: endTime, current: current, size: size)
+        .then((r) => r.json);
+    return List<BnApiMarginForceLiquidationItem>.from(data['rows'].map((e) => BnApiMarginForceLiquidationItem(e)));
+  }
+
+  Future<BnApiCrossMarginAccountInfo> marginAccount() async {
+    final Map data = await _api.marginAccount().then((r) => r.json);
+    return BnApiCrossMarginAccountInfo(data);
+  }
+
+  Future<BnApiMarginOrderGet> marginGetOrder(
+      {required String symbol, bool? isIsolated, int? orderId, String? origClientOrderId}) async {
+    final Map data = await _api
+        .marginGetOrder(symbol: symbol, isIsolated: isIsolated, orderId: orderId, origClientOrderId: origClientOrderId)
+        .then((r) => r.json);
+    return BnApiMarginOrderGet(data);
+  }
+
+  Future<List<BnApiMarginOrderGet>> marginGetOpenOrders({String? symbol, bool? isIsolated}) async {
+    final List data = await _api.marginGetOpenOrders(symbol: symbol, isIsolated: isIsolated).then((r) => r.json);
+    return List<BnApiMarginOrderGet>.from(data.map((e) => BnApiMarginOrderGet(e)));
+  }
+
+  Future<List<BnApiMarginOrderGet>> marginGetAllOrders({
+    required String symbol,
+    bool? isIsolated, // isolated margin or not, default false
+    int? orderId,
+    int? startTime,
+    int? endTime,
+    int? limit, // Default 500; max 500
+  }) async {
+    final List data = await _api
+        .marginGetAllOrders(
+            symbol: symbol,
+            isIsolated: isIsolated,
+            orderId: orderId,
+            startTime: startTime,
+            endTime: endTime,
+            limit: limit)
+        .then((r) => r.json);
+    return List<BnApiMarginOrderGet>.from(data.map((e) => BnApiMarginOrderGet(e)));
+  }
+
+  Future<List<BnApiMarginTrade>> marginGetTrades({
+    required String symbol,
+    bool? isIsolated, // isolated margin or not, default false
+    int? orderId,
+    int? startTime,
+    int? endTime,
+    int? fromId, // TradeId to fetch from. Default gets most recent trades
+    int? limit, // Default 500; max 1000.
+  }) async {
+    final List _data = await _api
+        .marginGetTrades(
+            symbol: symbol,
+            isIsolated: isIsolated,
+            orderId: orderId,
+            startTime: startTime,
+            endTime: endTime,
+            fromId: fromId,
+            limit: limit)
+        .then((r) => r.json);
+    return List<BnApiMarginTrade>.from(_data.map((e) => BnApiMarginTrade(e)));
+  }
+
   // print('Data: $data');
 // =================================================================================================================
 
@@ -241,87 +485,10 @@ class BnSerializedApi {
     return List.from(_data.map((e) => CandleStick(e)));
   }
 
-  Future<List<MarginOrder>> getOpenMarginOrders({String? symbol, bool? isIsolated}) async {
-    final List _data = await _api.getOpenMarginOrders(symbol: symbol, isIsolated: isIsolated).then((r) => r.json);
-    return List<MarginOrder>.from(_data.map((e) => MarginOrder(e)));
-  }
-
-  Future<MarginOrder> getMarginOrder(
-      {String? symbol, bool? isIsolated, int? orderId, String? origClientOrderId}) async {
-    final Map _data = await _api
-        .getMarginOrder(symbol: symbol, isIsolated: isIsolated, orderId: orderId, origClientOrderId: origClientOrderId)
-        .then((r) => r.json);
-    return MarginOrder(_data);
-  }
-
-  Future<MarginCreatedOrder> createMarginOrder(
-    String symbol,
-    String side, // BUY,SELL
-    String orderType, {
-    bool? isIsolated,
-    String? timeInForce, // GTC,IOC,FOK
-    double? quantity,
-    double? quoteOrderQty,
-    double? price,
-    double? stopPrice, // Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
-    String? newClientOrderId, // A unique id among open orders. Automatically generated if not sent.
-    double? icebergQty, // Used with LIMIT, STOP_LOSS_LIMIT, and TAKE_PROFIT_LIMIT to create an iceberg order.
-    String? newOrderRespType, // Set the response JSON. ACK, RESULT, or FULL;
-    String? sideEffectType, // NO_SIDE_EFFECT, MARGIN_BUY, AUTO_REPAY; default NO_SIDE_EFFECT
-  }) async {
-    final Map _data = await _api
-        .createMarginOrder(
-          symbol,
-          side,
-          orderType,
-          isIsolated: isIsolated,
-          timeInForce: timeInForce,
-          quantity: quantity,
-          quoteOrderQty: quoteOrderQty,
-          price: price,
-          stopPrice: stopPrice,
-          newClientOrderId: newClientOrderId,
-          icebergQty: icebergQty,
-          newOrderRespType: newOrderRespType,
-          sideEffectType: sideEffectType,
-        )
-        .then((r) => r.json);
-    return MarginCreatedOrder(_data);
-  }
-
-  Future<MarginCancelOrder> cancelMarginOrder(
-      {String? symbol, bool? isIsolated, int? orderId, String? origClientOrderId, String? newClientOrderId}) async {
-    final Map _data = await _api
-        .cancelMarginOrder(
-            symbol: symbol,
-            isIsolated: isIsolated,
-            orderId: orderId,
-            origClientOrderId: origClientOrderId,
-            newClientOrderId: newClientOrderId)
-        .then((r) => r.json);
-    return MarginCancelOrder(_data);
-  }
-
   Future<AvgPrice> getAvgPrice(String symbol) async => _api.getAvgPrice(symbol).then((r) => AvgPrice(r.json));
 
-  Future<MarginAsset> getMarginAsset(String asset) async => _api.getMarginAsset(asset).then((r) => MarginAsset(r.json));
-
-  Future<List<MarginTrade>> getMarginTrades(String symbol,
-      {bool? isIsolated, int? orderId, int? startTime, int? endTime, int? fromId, int? limit}) async {
-    final List _data = await _api
-        .getMarginTrades(symbol,
-            isIsolated: isIsolated,
-            orderId: orderId,
-            startTime: startTime,
-            endTime: endTime,
-            fromId: fromId,
-            limit: limit)
-        .then((r) => r.json);
-    return List<MarginTrade>.from(_data.map((e) => MarginTrade(e)));
-  }
-
-  Future<MarginLevelInfo> getMarginLevelInfo(String asset) async {
-    return await _api.getMarginLevelInfo(asset).then((r) => MarginLevelInfo(r.json));
+  Future<BnApiMarginLevelInfo> marginGetLevelInfo() async {
+    return await _api.marginGetLevelInfo().then((r) => BnApiMarginLevelInfo(r.json));
   }
 
   Future<List<IsolatedMarginTransfer>> getIsolatedTransferHistory(

@@ -76,6 +76,22 @@ class BnApiOrderSideEffect {
   static const String auto = 'AUTO_REPAY'; // For making auto repayment after order filled
 }
 
+class BnApiOrderRespType {
+  static const String ack = 'ACK';
+  static const String result = 'RESULT';
+  static const String full = 'FULL';
+}
+
+class BnApiOrderStatus {
+  static const String orderStatusNew = 'NEW';
+  static const String orderStatusPartiallyFilled = 'PARTIALLY_FILLED';
+  static const String orderStatusFilled = 'FILLED';
+  static const String orderStatusCanceled = 'CANCELED';
+  static const String orderStatusPendingCancel = 'PENDING_CANCEL';
+  static const String orderStatusRejected = 'REJECTED';
+  static const String orderStatusExpired = 'EXPIRED';
+}
+
 class BnApiSymbolStatus {
   static const String preTrading = 'PRE_TRADING';
   static const String trading = 'TRADING';
