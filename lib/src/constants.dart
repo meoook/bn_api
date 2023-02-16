@@ -118,22 +118,10 @@ class BnApiTimeFrame {
   static const String day3 = '3d';
   static const String week = '1w';
   static const String month = '1M';
-  static const List<String> choices = [
-    '1m',
-    '3m',
-    '5m',
-    '15m',
-    '1h',
-    '2h',
-    '4h',
-    '6h',
-    '8h',
-    '12h',
-    '1d',
-    '3d',
-    '1w',
-    '1M'
-  ];
+  static const List<String> _minutes = [min1, min3, min5, min15, min30];
+  static const List<String> _hours = [hour1, hour2, hour4, hour6, hour8, hour12];
+  static const List<String> _days = [day1, day3, week, month];
+  static const List<String> choices = [..._minutes, ..._hours, ..._days];
 }
 
 class BnApiUniversalTransfer {

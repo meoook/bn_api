@@ -1,32 +1,25 @@
 class IndividualSymbolTicker {
-  final String symbol;
-  final double changePrice;
-  final double changePercent;
-  final double priceLast;
-  final double priceHigh;
-  final double priceLow;
-  final double baseAssetVolume;
-  final double quoteAssetVolume;
-  final int numberOfTrades;
+  String symbol = '';
+  double changePrice = 0;
+  double changePercent = 0;
+  double priceLast = 0;
+  double priceHigh = 0;
+  double priceLow = 0;
+  double baseAssetVolume = 0;
+  double quoteAssetVolume = 0;
+  int numberOfTrades = 0;
 
-  IndividualSymbolTicker.fromDefault(this.symbol)
-      : changePrice = 0,
-        changePercent = 0,
-        priceLast = 0,
-        priceHigh = 0,
-        priceLow = 0,
-        baseAssetVolume = 0,
-        quoteAssetVolume = 0,
-        numberOfTrades = 0;
+  IndividualSymbolTicker(this.symbol);
 
-  IndividualSymbolTicker(Map m)
-      : symbol = m['s'],
-        changePrice = double.parse(m['p']),
-        changePercent = double.parse(m['P']),
-        priceLast = double.parse(m['c']),
-        priceHigh = double.parse(m['h']),
-        priceLow = double.parse(m['l']),
-        baseAssetVolume = double.parse(m['v']),
-        quoteAssetVolume = double.parse(m['q']),
-        numberOfTrades = m['n'];
+  void update(Map m) {
+    symbol = m['s'];
+    changePrice = double.parse(m['p']);
+    changePercent = double.parse(m['P']);
+    priceLast = double.parse(m['c']);
+    priceHigh = double.parse(m['h']);
+    priceLow = double.parse(m['l']);
+    baseAssetVolume = double.parse(m['v']);
+    quoteAssetVolume = double.parse(m['q']);
+    numberOfTrades = m['n'];
+  }
 }
