@@ -9,8 +9,6 @@ class IndividualSymbolTicker {
   double quoteAssetVolume = 0;
   int numberOfTrades = 0;
 
-  IndividualSymbolTicker(this.symbol);
-
   void update(Map m) {
     symbol = m['s'];
     changePrice = double.parse(m['p']);
